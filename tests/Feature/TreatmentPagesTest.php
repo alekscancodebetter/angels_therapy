@@ -13,6 +13,8 @@ class TreatmentPagesTest extends TestCase
                 ->assertOk()
                 ->assertSee($treatment['title'])
                 ->assertSee($treatment['summary'])
+                ->assertSee('<link rel="canonical" href="'.route('treatments.show', $slug).'">', false)
+                ->assertSee('"@type": "Service"', false)
                 ->assertSee('To be confirmed');
         }
     }
@@ -27,7 +29,23 @@ class TreatmentPagesTest extends TestCase
         $response = $this->get('/')->assertOk();
 
         foreach (array_keys(config('treatments')) as $slug) {
-            $response->assertSee(route('treatments.show', $slug), false);
+            $response->assertSee(
+                'href="'.route('treatments.show', $slug).'" target="_blank" rel="noopener noreferrer"',
+                false,
+            );
+        }
+    }
+
+    public function test_sitemap_lists_home_and_every_treatment_page(): void
+    {
+        $response = $this->get(route('sitemap'))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/xml');
+
+        $response->assertSee('<loc>'.route('home').'</loc>', false);
+
+        foreach (array_keys(config('treatments')) as $slug) {
+            $response->assertSee('<loc>'.route('treatments.show', $slug).'</loc>', false);
         }
     }
 }

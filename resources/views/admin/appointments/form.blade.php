@@ -1,0 +1,9 @@
+@php($editingAppointment = $appointment ?? null)
+<div class="admin-form-grid">
+    <label>Customer<select name="customer_id" required><option value="">Choose a customer</option>@foreach ($customers as $customer)<option value="{{ $customer->id }}" @selected((string) old('customer_id', $editingAppointment->customer_id ?? $selectedCustomerId ?? '') === (string) $customer->id)>{{ $customer->name }} · {{ $customer->email }}</option>@endforeach</select></label>
+    <label>Treatment<select name="treatment_slug"><option value="">General massage appointment</option>@foreach (config('treatments') as $slug => $treatment)<option value="{{ $slug }}" @selected(old('treatment_slug', $editingAppointment->treatment_slug ?? '') === $slug)>{{ $treatment['title'] }}</option>@endforeach</select></label>
+    <label>Date and time<input type="datetime-local" name="starts_at" value="{{ old('starts_at', $editingAppointment?->starts_at?->format('Y-m-d\TH:i') ?? now()->addDay()->setTime(10, 0)->format('Y-m-d\TH:i')) }}" required></label>
+    <label>Duration<select name="duration_minutes" required>@foreach ([30, 45, 60, 75, 90, 120] as $minutes)<option value="{{ $minutes }}" @selected((int) old('duration_minutes', $editingAppointment->duration_minutes ?? 60) === $minutes)>{{ $minutes }} minutes</option>@endforeach</select></label>
+    <label>Status<select name="status" required>@foreach (['scheduled' => 'Scheduled', 'completed' => 'Completed', 'cancelled' => 'Cancelled', 'no_show' => 'No show'] as $value => $label)<option value="{{ $value }}" @selected(old('status', $editingAppointment->status ?? 'scheduled') === $value)>{{ $label }}</option>@endforeach</select></label>
+    <label class="admin-form-wide">Private appointment notes<textarea name="notes" rows="6" maxlength="5000" placeholder="Anything useful for this appointment">{{ old('notes', $editingAppointment->notes ?? '') }}</textarea></label>
+</div>

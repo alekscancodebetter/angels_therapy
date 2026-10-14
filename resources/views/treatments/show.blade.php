@@ -5,10 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{ $treatment['summary'] }} Angel Touch Therapy in Harrogate with qualified and fully insured massage therapist Villy.">
     <meta name="theme-color" content="#2f6f9f">
+    <meta name="robots" content="index, follow">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ $treatment['title'] }} in Harrogate | Angel Touch Therapy">
+    <meta property="og:description" content="{{ $treatment['summary'] }}">
+    <meta property="og:url" content="{{ route('treatments.show', $slug) }}">
+    <meta property="og:image" content="{{ asset($treatment['image']) }}">
     <title>{{ $treatment['title'] }} in Harrogate | Angel Touch Therapy</title>
+    <link rel="canonical" href="{{ route('treatments.show', $slug) }}">
     <link rel="icon" type="image/png" href="{{ asset('images/angel-touch-mark.png') }}">
     <link rel="preload" href="{{ asset($treatment['image']) }}" as="image" fetchpriority="high">
     <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+    <script type="application/ld+json">
+        {!! json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'Service',
+            'name' => $treatment['title'],
+            'description' => $treatment['summary'],
+            'url' => route('treatments.show', $slug),
+            'image' => asset($treatment['image']),
+            'areaServed' => [
+                '@type' => 'City',
+                'name' => 'Harrogate',
+            ],
+            'provider' => [
+                '@type' => 'LocalBusiness',
+                'name' => 'Angel Touch Therapy',
+                'telephone' => '+447915910033',
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'streetAddress' => 'NuDerma Clinic, 137 Wetherby Road',
+                    'addressLocality' => 'Harrogate',
+                    'postalCode' => 'HG2 7AA',
+                    'addressCountry' => 'GB',
+                ],
+            ],
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) !!}
+    </script>
 </head>
 <body class="treatment-page">
     <a class="skip-link" href="#main">Skip to content</a>
@@ -20,7 +53,15 @@
         </a>
 
         <nav class="main-nav" id="main-nav" aria-label="Main navigation">
-            <a href="{{ route('home') }}#treatments">Treatments</a>
+            <details class="nav-dropdown">
+                <summary>Treatments <span aria-hidden="true">⌄</span></summary>
+                <div class="nav-dropdown__menu">
+                    <a href="{{ route('home') }}#treatments"><small aria-hidden="true">→</small><span>All treatments</span></a>
+                    @foreach (config('treatments') as $treatmentSlug => $navTreatment)
+                        <a href="{{ route('treatments.show', $treatmentSlug) }}"><small aria-hidden="true">→</small><span>{{ $navTreatment['title'] }}</span></a>
+                    @endforeach
+                </div>
+            </details>
             <a href="{{ route('home') }}#about">About Villy</a>
             <a href="{{ route('home') }}#stories">Reviews</a>
             <a href="{{ route('home') }}#contact">Contact</a>
@@ -28,7 +69,7 @@
 
         <div class="header-actions">
             <a class="phone-link" href="tel:+447915910033" aria-label="Call Angel Touch Therapy on 07915 910033"><span>Call</span> 07915 910 033</a>
-            <a class="button button--light" href="{{ route('home') }}#contact">Book appointment</a>
+            <a class="button button--light" href="{{ route('home') }}#booking">Book appointment</a>
             <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" data-menu-toggle>
                 <span></span><span></span><span></span><b>Menu</b>
             </button>
@@ -123,7 +164,7 @@
                 <div>
                     <p>Every appointment begins with a full consultation. Contact Villy to ask a question or request a {{ strtolower($treatment['title']) }} appointment.</p>
                     <div class="treatment-cta__actions">
-                        <a class="button button--dark" href="{{ route('home') }}#contact">Request an appointment</a>
+                        <a class="button button--dark" href="{{ route('home') }}#booking">Book your treatment</a>
                         <a class="text-link" href="tel:+447915910033">Call 07915 910 033</a>
                     </div>
                 </div>
@@ -138,7 +179,7 @@
                 </div>
                 <div class="related-grid">
                     @foreach ($otherTreatments as $otherSlug => $other)
-                        <a class="related-card reveal" href="{{ route('treatments.show', $otherSlug) }}">
+                        <a class="related-card reveal" href="{{ route('treatments.show', $otherSlug) }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ $other['title'] }} details in a new tab">
                             <img src="{{ asset($other['image']) }}" alt="" loading="lazy" width="1536" height="864">
                             <span><small>{{ $other['number'] }}</small><strong>{{ $other['title'] }}</strong><b aria-hidden="true">↗</b></span>
                         </a>
