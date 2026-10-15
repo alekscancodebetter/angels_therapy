@@ -3,7 +3,6 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\Appointment;
-use App\Models\AppointmentRequest;
 use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -21,19 +20,22 @@ class AdminDashboardTest extends TestCase
             'starts_at' => now()->addDay()->setTime(10, 0),
             'treatment_slug' => 'sports-massage',
         ]);
-        AppointmentRequest::create([
-            'name' => 'Sophie Green',
-            'email' => 'sophie@example.com',
-            'message' => 'I would like an appointment.',
-        ]);
-
         $this->actingAs($admin)
             ->get(route('admin.dashboard'))
             ->assertOk()
             ->assertSee('PRACTICE OVERVIEW')
             ->assertSee('Emma Wilson')
-            ->assertSee('Sophie Green')
+            ->assertDontSee('Requests')
             ->assertSee('New this month');
+    }
+
+    public function test_admin_requests_page_is_not_available(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->get('/admin/requests')
+            ->assertNotFound();
     }
 
     public function test_admin_can_view_a_month_calendar(): void

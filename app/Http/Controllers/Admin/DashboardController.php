@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
-use App\Models\AppointmentRequest;
 use App\Models\Customer;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -17,7 +16,6 @@ class DashboardController extends Controller
         $today = now()->startOfDay();
 
         $stats = [
-            'newRequests' => AppointmentRequest::query()->where('status', 'new')->count(),
             'upcomingAppointments' => Appointment::query()->where('status', 'scheduled')->where('starts_at', '>=', $today)->count(),
             'customers' => Customer::query()->count(),
             'newCustomersThisMonth' => Customer::query()->whereBetween('created_at', [$today->copy()->startOfMonth(), $today->copy()->endOfMonth()])->count(),
@@ -37,13 +35,10 @@ class DashboardController extends Controller
             ->limit(6)
             ->get();
 
-        $recentRequests = AppointmentRequest::query()->latest()->limit(5)->get();
-
         return view('admin.dashboard', [
             'stats' => $stats,
             'todayAppointments' => $todayAppointments,
             'upcomingAppointments' => $upcomingAppointments,
-            'recentRequests' => $recentRequests,
             'monthlyCustomers' => $this->monthlyCustomerCounts(),
         ]);
     }

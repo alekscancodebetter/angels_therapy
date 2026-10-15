@@ -15,6 +15,13 @@ class TreatmentPagesTest extends TestCase
                 ->assertSee($treatment['summary'])
                 ->assertSee('<link rel="canonical" href="'.route('treatments.show', $slug).'">', false)
                 ->assertSee('"@type": "Service"', false)
+                ->assertSee('<a class="nav-booking-link" href="'.route('home').'#booking">', false)
+                ->assertSee('data-cookie-consent', false)
+                ->assertSee('data-google-reviews-carousel', false)
+                ->assertSee('What clients say on Google.')
+                ->assertSee('Ryan Gordon')
+                ->assertSee('Nik Vjestica')
+                ->assertSee('Leave a review')
                 ->assertSee('To be confirmed');
         }
     }

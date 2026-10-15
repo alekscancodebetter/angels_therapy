@@ -3,7 +3,6 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\Appointment;
-use App\Models\AppointmentRequest;
 use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
@@ -81,25 +80,5 @@ class AppointmentManagementTest extends TestCase
         ])->assertSessionHasErrors(['starts_at']);
 
         $this->assertDatabaseCount('appointments', 1);
-    }
-
-    public function test_admin_can_progress_website_request_status(): void
-    {
-        $admin = User::factory()->admin()->create();
-        $appointmentRequest = AppointmentRequest::create([
-            'name' => 'Mia Harris',
-            'email' => 'mia@example.com',
-            'message' => 'Please contact me.',
-        ]);
-
-        $this->actingAs($admin)->patch(route('admin.requests.update', $appointmentRequest), [
-            'status' => 'contacted',
-        ])->assertSessionHas('status');
-
-        $this->assertDatabaseHas('appointment_requests', [
-            'id' => $appointmentRequest->id,
-            'status' => 'contacted',
-        ]);
-        $this->assertNotNull($appointmentRequest->fresh()->handled_at);
     }
 }

@@ -65,10 +65,14 @@
             <a href="{{ route('home') }}#about">About Villy</a>
             <a href="{{ route('home') }}#stories">Reviews</a>
             <a href="{{ route('home') }}#contact">Contact</a>
+            <a class="nav-booking-link" href="{{ route('home') }}#booking">
+                <span><strong>Book now</strong><small>Choose your appointment</small></span>
+                <span aria-hidden="true">→</span>
+            </a>
         </nav>
 
         <div class="header-actions">
-            <a class="phone-link" href="tel:+447915910033" aria-label="Call Angel Touch Therapy on 07915 910033"><span>Call</span> 07915 910 033</a>
+            <a class="phone-link" href="tel:+447915910033" aria-label="Call Angel Touch Therapy on 07915 910033"><span>Call now</span><strong>07915 910 033</strong></a>
             <a class="button button--light" href="{{ route('home') }}#booking">Book appointment</a>
             <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" data-menu-toggle>
                 <span></span><span></span><span></span><b>Menu</b>
@@ -105,6 +109,12 @@
                 </aside>
             </div>
         </section>
+
+        @include('google-reviews', [
+            'sectionId' => 'treatment-reviews',
+            'heading' => 'What clients say on Google.',
+            'compact' => true,
+        ])
 
         <section class="treatment-benefits section" aria-labelledby="suited-title">
             <div class="container">
@@ -202,8 +212,10 @@
                 <a href="skype:vili_spasova65?chat">Skype ↗</a>
             </div>
         </div>
-        <div class="container site-footer__bottom"><span>© {{ date('Y') }} Angel Touch Therapy</span><span>Professional and confidential massage therapy in Harrogate</span></div>
+        <div class="container site-footer__bottom"><span>© {{ date('Y') }} Angel Touch Therapy</span><span>Professional and confidential massage therapy in Harrogate</span><button class="cookie-settings" type="button" data-cookie-settings>Cookie settings</button></div>
     </footer>
+
+    @include('cookie-consent')
 
     <script src="{{ asset('js/site.js') }}" defer></script>
 </body>

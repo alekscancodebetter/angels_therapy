@@ -22,17 +22,31 @@ class HomePageTest extends TestCase
             ->assertSee('images/sports-massage.png', false)
             ->assertSee('images/deep-tissue-massage.png', false)
             ->assertSee('images/swedish-massage.png', false)
-            ->assertSee('images/full-body-massage.png', false);
+            ->assertSee('images/full-body-massage.png', false)
+            ->assertSee('<a class="nav-booking-link" href="#booking">', false)
+            ->assertSee('data-cookie-consent', false)
+            ->assertSee('Necessary only')
+            ->assertSee('Accept');
     }
 
-    public function test_testimonials_appear_before_villys_note_and_fht_logo_is_shown(): void
+    public function test_google_reviews_appear_near_the_top_of_the_page_and_link_to_google(): void
     {
         $this->get('/')
             ->assertOk()
             ->assertSeeInOrder([
-                'I have been seeing Villy for various treatments since 2011.',
-                'I am extremely grateful and passionate about my work.',
+                'Real stories from Google.',
+                'Massage treatments',
             ])
+            ->assertSee('data-google-reviews-carousel', false)
+            ->assertSee('Ryan Gordon')
+            ->assertSee('https://share.google/7oFQqDX4FM6MUO6Ox', false)
+            ->assertSee('Natasha Eustance')
+            ->assertSee('https://share.google/kvsnKwIddPlcgKr5P', false)
+            ->assertSee('audrey henderson')
+            ->assertSee('https://share.google/x7tEj7z1JKDz8za8D', false)
+            ->assertSee('<span class="google-reviews__position" aria-live="polite"><b data-google-reviews-current>1–3</b> / 12</span>', false)
+            ->assertSee('https://search.google.com/local/writereview?placeid=ChIJmwsJacNTeUgRbTtkdSsZo2o', false)
+            ->assertSee('Leave a review')
             ->assertSee('images/fht-logo.png', false)
             ->assertSee('Federation of Holistic Therapists logo');
     }

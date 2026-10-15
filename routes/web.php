@@ -3,7 +3,6 @@
 use App\Http\Controllers\Admin\AdminSessionController;
 use App\Http\Controllers\Admin\AdminSetupController;
 use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
-use App\Http\Controllers\Admin\AppointmentRequestController as AdminAppointmentRequestController;
 use App\Http\Controllers\Admin\CalendarController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -46,8 +45,6 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/calendar', CalendarController::class)->name('calendar');
         Route::resource('customers', CustomerController::class)->except(['destroy']);
         Route::resource('appointments', AdminAppointmentController::class)->only(['index', 'create', 'store', 'edit', 'update']);
-        Route::get('/requests', [AdminAppointmentRequestController::class, 'index'])->name('requests.index');
-        Route::patch('/requests/{appointmentRequest}', [AdminAppointmentRequestController::class, 'update'])->name('requests.update');
         Route::get('/settings', [SettingsController::class, 'edit'])->name('settings.edit');
         Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
         Route::post('/logout', [AdminSessionController::class, 'destroy'])->name('logout');

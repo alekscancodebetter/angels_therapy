@@ -39,10 +39,14 @@
             <a href="#about">About Villy</a>
             <a href="#stories">Reviews</a>
             <a href="#contact">Contact</a>
+            <a class="nav-booking-link" href="#booking">
+                <span><strong>Book now</strong><small>Choose your appointment</small></span>
+                <span aria-hidden="true">→</span>
+            </a>
         </nav>
 
         <div class="header-actions">
-            <a class="phone-link" href="tel:+447915910033" aria-label="Call Angel Touch Therapy on 07915 910033"><span>Call</span> 07915 910 033</a>
+            <a class="phone-link" href="tel:+447915910033" aria-label="Call Angel Touch Therapy on 07915 910033"><span>Call now</span><strong>07915 910 033</strong></a>
             <a class="button button--light" href="#booking">Book appointment</a>
             <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" data-menu-toggle>
                 <span></span><span></span><span></span><b>Menu</b>
@@ -81,6 +85,11 @@
                 </blockquote>
             </div>
         </section>
+
+        @include('google-reviews', [
+            'sectionId' => 'stories',
+            'heading' => 'Real stories from Google.',
+        ])
 
         <section class="treatments section" id="treatments" aria-labelledby="treatments-title">
             <div class="container">
@@ -165,54 +174,6 @@
                     <p>The road to achieving better health and vitality is easier than you think. If you want to enhance how you feel about yourself and your life, Villy can help guide and support you. She works skilfully to remove the deep tensions that prevent your body from being at its vital and optimal best.</p>
                     <p>She irons out postural imbalances, aches, pains, niggles and injuries to improve wellbeing and performance. It’s not just for athletes. Whatever you do with it, your body is so important to take care of. Put yourself in her magic ‘Angel Touch’ hands, and she will help you and take care of you.”</p>
                     <footer>Clare Smith <span>— Health Guru</span></footer>
-                </blockquote>
-            </div>
-        </section>
-
-        <section class="stories section section--ivory" id="stories" aria-labelledby="stories-title">
-            <div class="container">
-                <div class="stories__heading reveal">
-                    <div><p class="eyebrow eyebrow--dark">Testimonials</p><h2 id="stories-title">The stories they tell.</h2></div>
-                    <div class="slider-controls" aria-label="Testimonial controls">
-                        <button type="button" data-story-prev aria-label="Previous testimonial">←</button>
-                        <span><b data-story-current>1</b> / 5</span>
-                        <button type="button" data-story-next aria-label="Next testimonial">→</button>
-                    </div>
-                </div>
-
-                <div class="story-slider reveal" data-story-slider aria-live="polite">
-                    <article class="story is-active">
-                        <p>“I have been seeing Villy for various treatments since 2011. In late autumn 2016 I signed up to the challenge of Mallorca 312, an international cycling Gran Fondo. The challenge involves cycling 312km in a day. I could not have achieved this without the help of Villy. I had regular monthly sessions to prevent any injuries during my heavy training schedule. She helped return my body to normal, enabling me to keep consistent with my training.</p>
-                        <p>Less than a week before the event, the cricket season started and I developed a very tight and extremely painful shin. Luckily I had my last session with Villy, and she was able to get me to Mallorca pain free. Thanks again.”</p>
-                        <footer>Tom Rowlay</footer>
-                    </article>
-                    <article class="story" hidden>
-                        <p>“A success story. Straining my lower back whilst putting on crampons for a day’s snow climbing in the winter wonderland of Nethermost Cove in the Lake District proved a severe setback to preparations for a much anticipated trip to Nepal and the Everest region. By the time I got home from the Lakes, my back had locked out and I was in considerable pain. This was further aggravated the following day during a long day in Liverpool and an icebound M62 bottleneck.</p>
-                        <p>Help was needed to get me mobile again, so I called Guardian Angel Fitness. Villy suggested three sessions of remedial massage. There was an immediate improvement after the first visit, allowing me to ‘walk tall’ again and even cycle to the second appointment. Further improvement allowed me to restart my running club sessions and complete a 25-mile long-distance walking event over Blubberhouses Moor.</p>
-                        <p>The third hour of massage was sorely needed as a general tonic. I had regained full movement and could exercise at will again. The next job was to pack my bags and get off to Nepal. Thank you Villy, you worked wonders for me.”</p>
-                        <footer>Mike</footer>
-                    </article>
-                    <article class="story" hidden>
-                        <p>“My back problems started in early April. The doctor informed me that I was suffering a muscle spasm and to take painkillers. As there was no improvement I decided to see a chiropractor, but this gave me no pain relief. A friend advised that I try a sports massage with Villy.</p>
-                        <p>I booked an appointment and went in without much hope. After the massage I realised that, for the first time since my back problem, things had improved. I visited Villy over the next few weeks and her expertise returned me to full fitness. Many thanks.”</p>
-                        <footer>Daryl Bennett</footer>
-                    </article>
-                    <article class="story" hidden>
-                        <p>“My back and right shoulder were in so much pain it hurt to even breathe in. I was having to take tiny breaths because the pain was so bad. One visit to Villy and she had me sorted. The horrible pain was gone and I could breathe normally again.</p>
-                        <p>Now I have regular massages with Villy, which help release tension and tightness in my muscles. I always feel great afterwards and the benefits are endless. I always feel in very safe hands with Villy and would recommend her to everybody.”</p>
-                        <footer>Hollie</footer>
-                    </article>
-                    <article class="story" hidden>
-                        <p>“I had been at my wits’ end for eight months with pain from an impinged disc at L5. I began seeing Villy five weeks ago on a friend’s recommendation. My friend saw me daily and witnessed my struggle with simple tasks such as walking, carrying things and standing up — things I had taken for granted, but that had become so difficult because of the discomfort.</p>
-                        <p>I could not stand straight, straighten my left leg, walk more than a couple of yards without stopping and sitting down, or sit comfortably. I could not get relief. The sessions were challenging at first because I was in so much pain, but Villy was very understanding and ensured that I was comfortable at all times. If something hurt, she would stop or help me move position to alleviate the pain.</p>
-                        <p>She also recommended warm baths with magnesium flakes, a magnetic belt to reduce pressure on my discs, and gentle stretches and exercises — all of which I do and which work. I would like to thank Villy and would definitely recommend her massage therapy. Her knowledge and skill are exceptional. I am now walking straight and virtually pain free, much more mobile and able to enjoy my life. I am looking forward to exercising and getting fit again.”</p>
-                        <footer>Angela Clarke</footer>
-                    </article>
-                </div>
-
-                <blockquote class="founder-note reveal">
-                    <p>“I am extremely grateful and passionate about my work. It makes me very happy to see a smile on people’s faces, and the remarkable reviews mean so much. Client feedback is especially important to every professional — above all, I want to bring satisfaction and improve how people feel.”</p>
-                    <footer>Villy</footer>
                 </blockquote>
             </div>
         </section>
@@ -341,8 +302,10 @@
                 <a href="skype:vili_spasova65?chat">Skype ↗</a>
             </div>
         </div>
-        <div class="container site-footer__bottom"><span>© {{ date('Y') }} Angel Touch Therapy</span><span>Professional and confidential massage therapy in Harrogate</span></div>
+        <div class="container site-footer__bottom"><span>© {{ date('Y') }} Angel Touch Therapy</span><span>Professional and confidential massage therapy in Harrogate</span><button class="cookie-settings" type="button" data-cookie-settings>Cookie settings</button></div>
     </footer>
+
+    @include('cookie-consent')
 
     <script src="{{ asset('js/site.js') }}" defer></script>
 </body>

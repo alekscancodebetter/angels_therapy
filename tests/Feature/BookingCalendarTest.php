@@ -13,11 +13,11 @@ class BookingCalendarTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
-    public function test_availability_excludes_times_that_overlap_admin_appointments(): void
+    public function test_booked_time_is_unavailable_while_other_times_on_same_day_remain_available(): void
     {
         $this->travelTo(CarbonImmutable::parse('2026-10-14 09:00:00', 'Europe/London'));
         Appointment::factory()->create([
-            'starts_at' => '2026-10-19 10:30:00',
+            'starts_at' => '2026-10-19 10:00:00',
             'duration_minutes' => 60,
             'status' => Appointment::STATUS_SCHEDULED,
         ]);
@@ -32,12 +32,13 @@ class BookingCalendarTest extends TestCase
             ->assertJsonPath('month', '2026-10');
 
         $monday = collect($response->json('days'))->firstWhere('date', '2026-10-19');
-        $availableTimes = collect($monday['slots'])->pluck('value')->all();
+        $slotAvailability = collect($monday['slots'])
+            ->mapWithKeys(fn (array $slot): array => [$slot['value'] => $slot['available']]);
 
-        $this->assertContains('2026-10-19T09:00', $availableTimes);
-        $this->assertNotContains('2026-10-19T10:00', $availableTimes);
-        $this->assertNotContains('2026-10-19T11:00', $availableTimes);
-        $this->assertContains('2026-10-19T12:00', $availableTimes);
+        $this->assertSame(11, $slotAvailability->count());
+        $this->assertTrue($slotAvailability['2026-10-19T09:00']);
+        $this->assertFalse($slotAvailability['2026-10-19T10:00']);
+        $this->assertTrue($slotAvailability['2026-10-19T11:00']);
     }
 
     public function test_customer_can_book_an_available_time_into_the_admin_calendar(): void

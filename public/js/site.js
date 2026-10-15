@@ -89,6 +89,14 @@
             selectedDayLabel.textContent = day.label;
             timeSlots.replaceChildren();
 
+            const selectedSlotOption = day.slots.find((slot) => slot.value === selectedSlot);
+            if (selectedSlot && selectedDate === day.date && !selectedSlotOption?.available) {
+                selectedSlot = '';
+                selectedInput.value = '';
+                selectedAppointment.textContent = 'Choose a time';
+                submitButton.disabled = true;
+            }
+
             if (!day.slots.length) {
                 const emptyMessage = document.createElement('p');
                 emptyMessage.textContent = 'No appointments remain on this day.';
@@ -101,16 +109,21 @@
                 button.type = 'button';
                 button.className = 'booking-time';
                 button.dataset.slot = slot.value;
-                button.textContent = slot.label;
-                button.setAttribute('aria-pressed', String(slot.value === selectedSlot));
+                button.disabled = !slot.available;
+                button.textContent = slot.available ? slot.label : `${slot.label} · Booked`;
+                button.setAttribute('aria-label', slot.available ? slot.label : `${slot.label}, booked`);
+                button.setAttribute('aria-pressed', String(slot.available && slot.value === selectedSlot));
 
-                if (slot.value === selectedSlot) {
+                if (slot.available && slot.value === selectedSlot) {
                     button.classList.add('is-selected');
                     selectedAppointment.textContent = `${day.label} at ${slot.label}`;
                     submitButton.disabled = false;
                 }
 
-                button.addEventListener('click', () => setSelectedSlot(day, slot));
+                if (slot.available) {
+                    button.addEventListener('click', () => setSelectedSlot(day, slot));
+                }
+
                 timeSlots.append(button);
             });
         };
@@ -150,7 +163,7 @@
 
             calendar.days.forEach((day) => {
                 const button = document.createElement('button');
-                const availableCount = day.slots.length;
+                const availableCount = day.slots.filter((slot) => slot.available).length;
                 button.type = 'button';
                 button.className = 'booking-day';
                 button.dataset.date = day.date;
@@ -169,7 +182,9 @@
                 daysGrid.append(button);
             });
 
-            const selectedDay = calendar.days.find((day) => day.date === selectedDate && day.slots.length);
+            const selectedDay = calendar.days.find((day) => (
+                day.date === selectedDate && day.slots.some((slot) => slot.available)
+            ));
             if (selectedDay) {
                 renderTimeSlots(selectedDay);
             } else if (selectedDate) {
@@ -227,23 +242,59 @@
         revealItems.forEach((item) => item.classList.add('is-visible'));
     }
 
-    const stories = [...document.querySelectorAll('[data-story-slider] .story')];
-    const current = document.querySelector('[data-story-current]');
-    let activeStory = 0;
+    document.querySelectorAll('[data-google-reviews-carousel]').forEach((carousel) => {
+        const track = carousel.querySelector('[data-google-reviews-track]');
+        const cards = [...carousel.querySelectorAll('[data-google-review-card]')];
+        const previousButton = carousel.querySelector('[data-google-reviews-prev]');
+        const nextButton = carousel.querySelector('[data-google-reviews-next]');
+        const current = carousel.querySelector('[data-google-reviews-current]');
+        let activeIndex = 0;
 
-    const showStory = (index) => {
-        if (!stories.length) return;
-        activeStory = (index + stories.length) % stories.length;
-        stories.forEach((story, storyIndex) => {
-            const active = storyIndex === activeStory;
-            story.hidden = !active;
-            story.classList.toggle('is-active', active);
-        });
-        if (current) current.textContent = String(activeStory + 1);
-    };
+        const visibleCount = () => window.innerWidth <= 820 ? 1 : 3;
 
-    document.querySelector('[data-story-prev]')?.addEventListener('click', () => showStory(activeStory - 1));
-    document.querySelector('[data-story-next]')?.addEventListener('click', () => showStory(activeStory + 1));
+        const updateCarousel = () => {
+            if (!track || !cards.length) return;
+
+            const visibleCards = visibleCount();
+            const maximumStart = Math.max(0, cards.length - visibleCards);
+            activeIndex = Math.min(activeIndex, maximumStart);
+
+            const cardWidth = cards[0].getBoundingClientRect().width;
+            const gap = Number.parseFloat(window.getComputedStyle(track).gap) || 0;
+            track.style.transform = `translateX(-${activeIndex * (cardWidth + gap)}px)`;
+
+            cards.forEach((card, index) => {
+                const isVisible = index >= activeIndex && index < activeIndex + visibleCards;
+                card.tabIndex = isVisible ? 0 : -1;
+                card.setAttribute('aria-hidden', String(!isVisible));
+            });
+
+            if (current) {
+                const lastVisible = Math.min(activeIndex + visibleCards, cards.length);
+                current.textContent = visibleCards === 1
+                    ? String(activeIndex + 1)
+                    : `${activeIndex + 1}–${lastVisible}`;
+            }
+        };
+
+        const moveCarousel = (direction) => {
+            const step = visibleCount();
+            const maximumStart = Math.max(0, cards.length - step);
+
+            if (direction > 0) {
+                activeIndex = activeIndex >= maximumStart ? 0 : Math.min(activeIndex + step, maximumStart);
+            } else {
+                activeIndex = activeIndex <= 0 ? maximumStart : Math.max(0, activeIndex - step);
+            }
+
+            updateCarousel();
+        };
+
+        previousButton?.addEventListener('click', () => moveCarousel(-1));
+        nextButton?.addEventListener('click', () => moveCarousel(1));
+        window.addEventListener('resize', updateCarousel, { passive: true });
+        window.requestAnimationFrame(updateCarousel);
+    });
 
     document.querySelectorAll('[data-video]').forEach((button) => {
         button.addEventListener('click', () => {
@@ -257,4 +308,49 @@
             button.append(iframe);
         });
     });
+
+    const cookieConsent = document.querySelector('[data-cookie-consent]');
+    const cookieConsentStorageKey = 'angel-touch-cookie-consent-v1';
+
+    if (cookieConsent) {
+        const showCookieConsent = () => {
+            cookieConsent.hidden = false;
+            window.requestAnimationFrame(() => cookieConsent.classList.add('is-visible'));
+            cookieConsent.querySelector('[data-cookie-choice="all"]')?.focus({ preventScroll: true });
+        };
+
+        const hideCookieConsent = () => {
+            cookieConsent.classList.remove('is-visible');
+            window.setTimeout(() => {
+                cookieConsent.hidden = true;
+            }, 250);
+        };
+
+        let savedCookieChoice = null;
+        try {
+            savedCookieChoice = window.localStorage.getItem(cookieConsentStorageKey);
+        } catch (error) {
+            savedCookieChoice = null;
+        }
+
+        if (!savedCookieChoice) {
+            showCookieConsent();
+        }
+
+        cookieConsent.querySelectorAll('[data-cookie-choice]').forEach((button) => {
+            button.addEventListener('click', () => {
+                try {
+                    window.localStorage.setItem(cookieConsentStorageKey, button.dataset.cookieChoice);
+                } catch (error) {
+                    // The choice still applies for this page when browser storage is unavailable.
+                }
+
+                hideCookieConsent();
+            });
+        });
+
+        document.querySelectorAll('[data-cookie-settings]').forEach((button) => {
+            button.addEventListener('click', showCookieConsent);
+        });
+    }
 })();

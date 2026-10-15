@@ -20,7 +20,6 @@
             <p>Practice</p>
             <a href="{{ route('admin.dashboard') }}" @class(['is-active' => request()->routeIs('admin.dashboard')])><span>⌂</span>Overview</a>
             <a href="{{ route('admin.calendar') }}" @class(['is-active' => request()->routeIs('admin.calendar', 'admin.appointments.*')])><span>□</span>Calendar</a>
-            <a href="{{ route('admin.requests.index') }}" @class(['is-active' => request()->routeIs('admin.requests.*')])><span>↗</span>Requests</a>
             <a href="{{ route('admin.customers.index') }}" @class(['is-active' => request()->routeIs('admin.customers.*')])><span>○</span>Customers</a>
             <p>Account</p>
             <a href="{{ route('admin.settings.edit') }}" @class(['is-active' => request()->routeIs('admin.settings.*')])><span>◇</span>Settings</a>

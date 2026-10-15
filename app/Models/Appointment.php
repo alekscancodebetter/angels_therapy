@@ -73,7 +73,7 @@ class Appointment extends Model
     }
 
     /**
-     * @return array<int, array{date: string, day: int, weekday: int, label: string, slots: array<int, array{value: string, label: string}>}>
+     * @return array<int, array{date: string, day: int, weekday: int, label: string, slots: array<int, array{value: string, label: string, available: bool}>}>
      */
     public static function availableSlotsForMonth(CarbonImmutable $month): array
     {
@@ -105,10 +105,11 @@ class Appointment extends Model
                         ->get($day->format('Y-m-d'), collect())
                         ->contains(fn (self $appointment): bool => $appointment->overlaps($slotStartsAt, $slotEndsAt));
 
-                    if (self::isBookableStart($slotStartsAt) && ! $hasConflict) {
+                    if (self::isBookableStart($slotStartsAt)) {
                         $slots[] = [
                             'value' => $slotStartsAt->format('Y-m-d\TH:i'),
                             'label' => $slotStartsAt->format('g:i A'),
+                            'available' => ! $hasConflict,
                         ];
                     }
                 }
