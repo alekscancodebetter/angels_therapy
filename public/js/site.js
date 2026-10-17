@@ -50,12 +50,19 @@
     nav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => closeMenu()));
 
     nav?.querySelectorAll('.nav-dropdown').forEach((dropdown) => {
+        let closeTimer;
+
         dropdown.addEventListener('mouseenter', () => {
-            if (opensOnHover()) dropdown.setAttribute('open', '');
+            if (!opensOnHover()) return;
+
+            window.clearTimeout(closeTimer);
+            dropdown.setAttribute('open', '');
         });
 
         dropdown.addEventListener('mouseleave', () => {
-            if (opensOnHover()) dropdown.removeAttribute('open');
+            if (!opensOnHover()) return;
+
+            closeTimer = window.setTimeout(() => dropdown.removeAttribute('open'), 180);
         });
 
         dropdown.querySelector('summary')?.addEventListener('click', (event) => {
