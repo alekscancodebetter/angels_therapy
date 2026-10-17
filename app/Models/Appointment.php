@@ -36,6 +36,11 @@ class Appointment extends Model
 
     public static function hasConflict(CarbonInterface $startsAt, int $durationMinutes, ?int $ignoredAppointmentId = null): bool
     {
+        return self::conflictingAppointment($startsAt, $durationMinutes, $ignoredAppointmentId) !== null;
+    }
+
+    public static function conflictingAppointment(CarbonInterface $startsAt, int $durationMinutes, ?int $ignoredAppointmentId = null): ?self
+    {
         $slotStartsAt = CarbonImmutable::instance($startsAt);
         $slotEndsAt = $slotStartsAt->addMinutes($durationMinutes);
 
@@ -44,9 +49,10 @@ class Appointment extends Model
             ->when($ignoredAppointmentId, fn ($query, int $appointmentId) => $query->whereKeyNot($appointmentId))
             ->where('starts_at', '>=', $slotStartsAt->subMinutes(self::MAX_DURATION_MINUTES))
             ->where('starts_at', '<', $slotEndsAt)
-            ->get(['id', 'starts_at', 'duration_minutes']);
+            ->orderBy('starts_at')
+            ->get(['id', 'customer_id', 'starts_at', 'duration_minutes']);
 
-        return self::firstConflictingAppointment($appointments, $slotStartsAt, $slotEndsAt) !== null;
+        return self::firstConflictingAppointment($appointments, $slotStartsAt, $slotEndsAt);
     }
 
     public static function isBookableStart(CarbonInterface $startsAt, ?int $durationMinutes = null): bool

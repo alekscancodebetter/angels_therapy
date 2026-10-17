@@ -158,7 +158,7 @@
                         <p class="privacy-section-number">05</p>
                         <h2>Cookies, browser storage and external content</h2>
                         <p>The website uses strictly necessary session and security cookies so that forms and the administration area work securely. Your cookie preference is saved in your browser’s local storage under <code>angel-touch-cookie-consent-v1</code>. You can remove it through your browser settings or reopen the notice using the “Cookie settings” button in the footer.</p>
-                        <p>We do not use advertising or analytics cookies. Video preview images are supplied by YouTube. A privacy-enhanced YouTube player is loaded only after you choose to play a video; YouTube may then receive technical information and set or access its own storage. Links to Google Maps, Google Reviews, Instagram, YouTube and Skype take you to services with their own privacy policies.</p>
+                        <p>We do not use advertising or analytics cookies. Video preview images are supplied by YouTube. A privacy-enhanced YouTube player is loaded only after you choose to play a video; YouTube may then receive technical information and set or access its own storage. Links to Google Maps, Google Reviews, Instagram and YouTube take you to services with their own privacy policies.</p>
                     </section>
 
                     <section id="retention">
@@ -214,7 +214,6 @@
             <div class="social-links">
                 <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
                 <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
-                <a href="skype:vili_spasova65?chat">Skype</a>
             </div>
         </div>
         <div class="container site-footer__bottom">

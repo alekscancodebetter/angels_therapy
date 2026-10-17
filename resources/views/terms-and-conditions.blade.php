@@ -171,7 +171,7 @@
                         <p class="privacy-section-number">09</p>
                         <h2>Website use and privacy</h2>
                         <p>The website is provided for general information and appointment booking. We take reasonable care to keep it available and accurate but cannot promise uninterrupted access. Content, branding and images owned by Angel Touch Therapy may not be copied or used commercially without permission.</p>
-                        <p>External websites, including Google, YouTube, Instagram and Skype, have their own terms and privacy practices. How we handle personal information is explained in our <a href="{{ route('privacy-policy') }}">Privacy Policy</a>.</p>
+                        <p>External websites, including Google, YouTube and Instagram, have their own terms and privacy practices. How we handle personal information is explained in our <a href="{{ route('privacy-policy') }}">Privacy Policy</a>.</p>
                     </section>
 
                     <section id="contact-and-law">
@@ -196,7 +196,6 @@
             <div class="social-links">
                 <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
                 <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
-                <a href="skype:vili_spasova65?chat">Skype</a>
             </div>
         </div>
         <div class="container site-footer__bottom">

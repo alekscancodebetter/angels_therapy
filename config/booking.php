@@ -22,5 +22,6 @@ return [
     'booking_window_days' => 62,
     'opening_time' => '08:00',
     'closing_time' => '19:00',
+    'admin_interval_minutes' => 30,
     'working_days' => [1, 2, 3, 4, 5],
 ];

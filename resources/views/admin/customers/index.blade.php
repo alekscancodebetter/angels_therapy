@@ -20,7 +20,7 @@
                 <tbody>
                     @forelse ($customers as $customer)
                         <tr>
-                            <td><a class="customer-cell" href="{{ route('admin.customers.show', $customer) }}"><span>{{ strtoupper(substr($customer->name, 0, 1)) }}</span><strong>{{ $customer->name }}<small>{{ $customer->email }}</small></strong></a></td>
+                            <td><a class="customer-cell" href="{{ route('admin.customers.show', $customer) }}"><span>{{ strtoupper(substr($customer->name, 0, 1)) }}</span><strong>{{ $customer->name }}<small>{{ $customer->email ?: 'No email address' }}</small></strong></a></td>
                             <td>{{ $customer->phone ?: '—' }}</td>
                             <td>{{ $customer->appointments_count }}</td>
                             <td>{{ $customer->created_at->format('d M Y') }}</td>

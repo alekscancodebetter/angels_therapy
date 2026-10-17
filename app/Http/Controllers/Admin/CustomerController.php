@@ -42,7 +42,7 @@ class CustomerController extends Controller
     {
         $customer = Customer::create([
             ...$request->validated(),
-            'email' => Str::lower($request->string('email')->trim()->toString()),
+            'email' => $this->normalizedEmail($request),
         ]);
 
         return redirect()->route('admin.customers.show', $customer)->with('status', 'Customer added successfully.');
@@ -64,9 +64,16 @@ class CustomerController extends Controller
     {
         $customer->update([
             ...$request->validated(),
-            'email' => Str::lower($request->string('email')->trim()->toString()),
+            'email' => $this->normalizedEmail($request),
         ]);
 
         return redirect()->route('admin.customers.show', $customer)->with('status', 'Customer details updated.');
+    }
+
+    private function normalizedEmail(Request $request): ?string
+    {
+        $email = Str::lower($request->string('email')->trim()->toString());
+
+        return $email !== '' ? $email : null;
     }
 }

@@ -16,9 +16,17 @@ class StoreCustomerRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email:rfc', 'max:190', 'unique:customers,email'],
-            'phone' => ['nullable', 'string', 'max:40'],
+            'email' => ['nullable', 'email:rfc', 'max:190', 'unique:customers,email'],
+            'phone' => ['required', 'string', 'max:40'],
             'notes' => ['nullable', 'string', 'max:5000'],
+        ];
+    }
+
+    /** @return array<string, string> */
+    public function messages(): array
+    {
+        return [
+            'phone.required' => 'Please enter the customer’s telephone number.',
         ];
     }
 }

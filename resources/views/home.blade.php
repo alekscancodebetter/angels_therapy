@@ -323,7 +323,11 @@
                 @php
                     $oldStartsAt = (string) old('starts_at', '');
                     $bookingMonth = preg_match('/^\d{4}-\d{2}/', $oldStartsAt) ? substr($oldStartsAt, 0, 7) : now()->format('Y-m');
+                    $bookingTreatment = (string) old('treatment_slug', '');
+                    $bookingTreatmentLabel = config('treatments')[$bookingTreatment]['title'] ?? 'Choose your treatment';
                     $bookingDuration = (int) old('duration_minutes', config('booking.duration_minutes'));
+                    $bookingDurationOption = config('booking.duration_options')[$bookingDuration];
+                    $bookingDurationLabel = $bookingDurationOption['label'].' — £'.$bookingDurationOption['price'];
                 @endphp
                 <form
                     class="booking-layout reveal"
@@ -343,8 +347,38 @@
                         <div class="booking-calendar__step booking-calendar__step--dark"><span>01</span><div><small>Your details</small><h3 id="booking-details-title">Who is the treatment for?</h3></div></div>
                         <div class="contact-form booking-form">
                             <div class="booking-form__row">
-                                <label for="treatment_slug"><span>Treatment</span><select id="treatment_slug" name="treatment_slug" required @error('treatment_slug') aria-invalid="true" aria-describedby="treatment_slug_error" @enderror><option value="">Choose your treatment</option>@foreach (config('treatments') as $slug => $treatment)<option value="{{ $slug }}" @selected(old('treatment_slug') === $slug)>{{ $treatment['title'] }}</option>@endforeach</select>@error('treatment_slug')<small id="treatment_slug_error">{{ $message }}</small>@enderror</label>
-                                <label for="duration_minutes"><span>Duration &amp; price</span><select id="duration_minutes" name="duration_minutes" required data-booking-duration @error('duration_minutes') aria-invalid="true" aria-describedby="duration_minutes_error" @enderror>@foreach (config('booking.duration_options') as $duration => $option)<option value="{{ $duration }}" @selected($bookingDuration === $duration)>{{ $option['label'] }} — £{{ $option['price'] }}</option>@endforeach</select>@error('duration_minutes')<small id="duration_minutes_error">{{ $message }}</small>@enderror</label>
+                                <fieldset class="booking-choice-field" @error('treatment_slug') aria-describedby="treatment_slug_error" @enderror>
+                                    <legend>Treatment</legend>
+                                    <label class="visually-hidden" for="treatment_slug">Treatment</label>
+                                    <details class="booking-dropdown" data-booking-dropdown data-booking-placeholder="Choose your treatment" @error('treatment_slug') aria-invalid="true" open @enderror>
+                                        <summary><span data-booking-dropdown-label>{{ $bookingTreatmentLabel }}</span><span class="booking-dropdown__icon" aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="m5 7.5 5 5 5-5" /></svg></span></summary>
+                                        <div class="booking-dropdown__menu" role="group" aria-label="Treatment options">
+                                            @foreach (config('treatments') as $slug => $treatment)
+                                                <label class="booking-dropdown__option">
+                                                    <input type="radio" name="treatment_slug" value="{{ $slug }}" data-booking-dropdown-option data-booking-option-label="{{ $treatment['title'] }}" required @checked($bookingTreatment === $slug) @if ($loop->first) id="treatment_slug" @error('treatment_slug') aria-invalid="true" aria-describedby="treatment_slug_error" @enderror @endif>
+                                                    <span>{{ $treatment['title'] }}</span><b aria-hidden="true">✓</b>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </details>
+                                    @error('treatment_slug')<small id="treatment_slug_error">{{ $message }}</small>@enderror
+                                </fieldset>
+                                <fieldset class="booking-choice-field" @error('duration_minutes') aria-describedby="duration_minutes_error" @enderror>
+                                    <legend>Duration &amp; price</legend>
+                                    <label class="visually-hidden" for="duration_minutes">Duration and price</label>
+                                    <details class="booking-dropdown" data-booking-dropdown data-booking-placeholder="Choose a duration" @error('duration_minutes') aria-invalid="true" open @enderror>
+                                        <summary><span data-booking-dropdown-label>{{ $bookingDurationLabel }}</span><span class="booking-dropdown__icon" aria-hidden="true"><svg viewBox="0 0 20 20" focusable="false"><path d="m5 7.5 5 5 5-5" /></svg></span></summary>
+                                        <div class="booking-dropdown__menu" role="group" aria-label="Duration and price options">
+                                            @foreach (config('booking.duration_options') as $duration => $option)
+                                                <label class="booking-dropdown__option">
+                                                    <input type="radio" name="duration_minutes" value="{{ $duration }}" data-booking-dropdown-option data-booking-duration data-booking-option-label="{{ $option['label'] }} — £{{ $option['price'] }}" @checked($bookingDuration === $duration) @if ($loop->first) id="duration_minutes" @error('duration_minutes') aria-invalid="true" aria-describedby="duration_minutes_error" @enderror @endif>
+                                                    <span>{{ $option['label'] }} <small>£{{ $option['price'] }}</small></span><b aria-hidden="true">✓</b>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </details>
+                                    @error('duration_minutes')<small id="duration_minutes_error">{{ $message }}</small>@enderror
+                                </fieldset>
                             </div>
                             <p class="booking-package-note"><strong>Prepaid package:</strong> {{ config('booking.package.label') }} for £{{ config('booking.package.price') }}. Mention the package in your message or contact Villy to arrange it.</p>
                             <div class="booking-form__row">
@@ -416,7 +450,6 @@
             <div class="social-links">
                 <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
                 <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
-                <a href="skype:vili_spasova65?chat">Skype</a>
             </div>
         </div>
         <div class="container site-footer__bottom">

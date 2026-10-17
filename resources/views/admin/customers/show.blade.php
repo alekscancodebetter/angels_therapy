@@ -11,7 +11,7 @@
         <section class="admin-panel customer-profile-card">
             <span class="customer-avatar">{{ strtoupper(substr($customer->name, 0, 1)) }}</span>
             <h2>{{ $customer->name }}</h2>
-            <dl><div><dt>Email</dt><dd><a href="mailto:{{ $customer->email }}">{{ $customer->email }}</a></dd></div><div><dt>Telephone</dt><dd>{{ $customer->phone ?: 'Not provided' }}</dd></div><div><dt>Total appointments</dt><dd>{{ $appointments->total() }}</dd></div></dl>
+            <dl><div><dt>Email</dt><dd>@if ($customer->email)<a href="mailto:{{ $customer->email }}">{{ $customer->email }}</a>@else Not provided @endif</dd></div><div><dt>Telephone</dt><dd>{{ $customer->phone }}</dd></div><div><dt>Total appointments</dt><dd>{{ $appointments->total() }}</dd></div></dl>
         </section>
         <section class="admin-panel customer-notes"><div class="admin-panel-heading"><div><p class="admin-eyebrow">PRIVATE</p><h2>Customer notes</h2></div></div><p>{{ $customer->notes ?: 'No private notes have been added.' }}</p></section>
     </div>

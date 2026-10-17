@@ -126,7 +126,8 @@
         const selectedInput = bookingCalendar.querySelector('[data-booking-input]');
         const selectedAppointment = bookingCalendar.querySelector('[data-selected-appointment]');
         const submitButton = bookingCalendar.querySelector('[data-booking-submit]');
-        const durationSelect = bookingCalendar.querySelector('[data-booking-duration]');
+        const durationOptions = [...bookingCalendar.querySelectorAll('[data-booking-duration]')];
+        const bookingDropdowns = [...bookingCalendar.querySelectorAll('[data-booking-dropdown]')];
         let selectedSlot = bookingCalendar.dataset.selectedSlot || '';
         let selectedDate = selectedSlot.slice(0, 10);
         let displayedMonth = bookingCalendar.dataset.initialMonth;
@@ -135,6 +136,52 @@
         let availabilityRequestNumber = 0;
         let isSubmitting = false;
         let isCalendarStarted = false;
+
+        const syncBookingDropdown = (dropdown) => {
+            const selectedOption = dropdown.querySelector('[data-booking-dropdown-option]:checked');
+            const selectedLabel = dropdown.querySelector('[data-booking-dropdown-label]');
+
+            if (selectedLabel) {
+                selectedLabel.textContent = selectedOption?.dataset.bookingOptionLabel || dropdown.dataset.bookingPlaceholder;
+            }
+        };
+
+        bookingDropdowns.forEach((dropdown) => {
+            syncBookingDropdown(dropdown);
+
+            dropdown.addEventListener('toggle', () => {
+                if (!dropdown.open) return;
+
+                bookingDropdowns.forEach((otherDropdown) => {
+                    if (otherDropdown !== dropdown) otherDropdown.removeAttribute('open');
+                });
+            });
+
+            dropdown.querySelectorAll('[data-booking-dropdown-option]').forEach((option) => {
+                option.addEventListener('change', () => {
+                    dropdown.querySelectorAll('input[type="radio"]').forEach((radio) => radio.setCustomValidity(''));
+                    dropdown.removeAttribute('aria-invalid');
+                    syncBookingDropdown(dropdown);
+                    dropdown.removeAttribute('open');
+                });
+            });
+        });
+
+        document.addEventListener('click', (event) => {
+            bookingDropdowns.forEach((dropdown) => {
+                if (dropdown.open && !dropdown.contains(event.target)) dropdown.removeAttribute('open');
+            });
+        });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key !== 'Escape') return;
+
+            const openDropdown = bookingDropdowns.find((dropdown) => dropdown.open);
+            if (openDropdown) {
+                openDropdown.removeAttribute('open');
+                openDropdown.querySelector('summary')?.focus();
+            }
+        });
 
         const requiredFieldMessages = {
             treatment_slug: 'Please choose a treatment.',
@@ -154,6 +201,12 @@
                 } else if (field.validity.typeMismatch && field.type === 'email') {
                     field.setCustomValidity('Please enter a valid email address.');
                 }
+
+                const dropdown = field.closest('[data-booking-dropdown]');
+                if (dropdown) {
+                    dropdown.setAttribute('open', '');
+                    window.requestAnimationFrame(() => dropdown.querySelector('summary')?.focus());
+                }
             });
 
             const clearValidationMessage = () => field.setCustomValidity('');
@@ -161,11 +214,21 @@
             field.addEventListener('change', clearValidationMessage);
         });
 
-        const durationLabel = () => durationSelect?.selectedOptions[0]?.textContent || '';
+        const selectedDurationOption = () => durationOptions.find((option) => option.checked);
+        const durationValue = () => selectedDurationOption()?.value || '';
+        const durationLabel = () => selectedDurationOption()?.dataset.bookingOptionLabel || '';
+        const setDurationValue = (duration) => {
+            const durationOption = durationOptions.find((option) => option.value === String(duration));
+            if (!durationOption) return;
 
-        const resetSelectedSlot = () => {
+            durationOption.checked = true;
+            syncBookingDropdown(durationOption.closest('[data-booking-dropdown]'));
+        };
+
+        const resetSelectedSlot = (preserveDate = false) => {
+            const dateToPreserve = preserveDate ? selectedDate : '';
             selectedSlot = '';
-            selectedDate = '';
+            selectedDate = dateToPreserve;
             selectedInput.value = '';
             selectedAppointment.textContent = 'Choose a date and time';
             submitButton.disabled = true;
@@ -256,7 +319,7 @@
                         const targetDate = day.date;
                         const targetSlot = slot.value;
                         alternativeButton.disabled = true;
-                        durationSelect.value = String(suggestedDuration);
+                        setDurationValue(suggestedDuration);
                         resetSelectedSlot();
 
                         const calendarLoaded = await loadCalendar(displayedMonth);
@@ -355,7 +418,7 @@
             availabilityRequest?.abort();
             availabilityRequest = new AbortController();
             const requestNumber = ++availabilityRequestNumber;
-            const requestedDuration = durationSelect.value;
+            const requestedDuration = durationValue();
 
             bookingCalendar.setAttribute('aria-busy', 'true');
             loadingMessage.hidden = false;
@@ -366,7 +429,7 @@
             try {
                 const url = new URL(availabilityUrl, window.location.origin);
                 url.searchParams.set('month', month);
-                url.searchParams.set('duration_minutes', durationSelect.value);
+                url.searchParams.set('duration_minutes', durationValue());
                 const response = await fetch(url, {
                     headers: { Accept: 'application/json' },
                     credentials: 'same-origin',
@@ -379,7 +442,7 @@
                 const calendar = await response.json();
                 if (requestNumber !== availabilityRequestNumber
                     || String(calendar.duration_minutes) !== requestedDuration
-                    || durationSelect.value !== requestedDuration) {
+                    || durationValue() !== requestedDuration) {
                     return false;
                 }
 
@@ -416,10 +479,10 @@
         nextButton.addEventListener('click', () => {
             if (nextButton.dataset.month) loadCalendar(nextButton.dataset.month);
         });
-        durationSelect.addEventListener('change', () => {
-            resetSelectedSlot();
+        durationOptions.forEach((durationOption) => durationOption.addEventListener('change', () => {
+            resetSelectedSlot(true);
             loadCalendar(displayedMonth);
-        });
+        }));
         bookingCalendar.addEventListener('submit', async (event) => {
             if (isSubmitting || !selectedSlot) return;
 
