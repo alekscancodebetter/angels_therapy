@@ -18,8 +18,13 @@
         <div class="admin-calendar-grid">
             @foreach ($days as $day)
                 <div @class(['admin-calendar-day', 'is-outside' => !$day->isSameMonth($month), 'is-today' => $day->isToday()])>
+                    <a
+                        class="admin-calendar-day__create"
+                        href="{{ route('admin.appointments.create', ['date' => $day->format('Y-m-d')]) }}"
+                        aria-label="New appointment on {{ $day->format('l, j F Y') }}"
+                    ></a>
                     <time datetime="{{ $day->format('Y-m-d') }}">{{ $day->format('j') }}</time>
-                    <div>
+                    <div class="admin-calendar-events">
                         @foreach ($appointments->get($day->format('Y-m-d'), collect()) as $appointment)
                             <a class="calendar-event calendar-event--{{ $appointment->status }}" href="{{ route('admin.appointments.edit', $appointment) }}"><strong>{{ $appointment->starts_at->format('H:i') }}</strong><span>{{ $appointment->customer->name }}</span><small>{{ config('treatments.'.$appointment->treatment_slug.'.title', 'Massage') }}</small></a>
                         @endforeach

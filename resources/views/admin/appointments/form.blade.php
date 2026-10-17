@@ -6,7 +6,8 @@
     $currentCustomerLabel = $currentCustomer
         ? collect([$currentCustomer->name, $currentCustomer->email, $currentCustomer->phone])->filter()->join(' · ')
         : '';
-    $appointmentDate = old('appointment_date', $editingAppointment?->starts_at?->format('Y-m-d') ?? now()->addDay()->format('Y-m-d'));
+    $requestedAppointmentDate = request()->query('date');
+    $appointmentDate = old('appointment_date', $editingAppointment?->starts_at?->format('Y-m-d') ?? (is_string($requestedAppointmentDate) ? $requestedAppointmentDate : now()->addDay()->format('Y-m-d')));
     $appointmentTime = old('appointment_time', $editingAppointment?->starts_at?->format('H:i') ?? '10:00');
     $selectedTreatment = (string) old('treatment_slug', $editingAppointment->treatment_slug ?? '');
     $treatmentOptions = collect(['' => 'General massage appointment'])

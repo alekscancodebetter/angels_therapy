@@ -113,11 +113,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .admin-calendar-weekdays, .admin-calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .admin-calendar-weekdays { color: var(--admin-muted); background: #f7fafb; border-bottom: 1px solid var(--admin-line); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-align: center; text-transform: uppercase; }
 .admin-calendar-weekdays span { padding: 10px; }
-.admin-calendar-day { min-height: 145px; padding: 10px; border-right: 1px solid var(--admin-line); border-bottom: 1px solid var(--admin-line); }
+.admin-calendar-day { position: relative; min-height: 145px; padding: 10px; border-right: 1px solid var(--admin-line); border-bottom: 1px solid var(--admin-line); transition: background-color .18s ease; }
 .admin-calendar-day:nth-child(7n) { border-right: 0; }
-.admin-calendar-day > time { display: grid; width: 27px; height: 27px; place-items: center; margin-bottom: 7px; border-radius: 50%; font-size: 12px; font-weight: 700; }
+.admin-calendar-day__create { position: absolute; inset: 0; z-index: 1; }
+.admin-calendar-day__create:focus-visible { border-radius: 4px; outline: 3px solid var(--admin-blue); outline-offset: -4px; }
+.admin-calendar-day:has(> .admin-calendar-day__create:hover) { background: var(--admin-blue-soft); }
+.admin-calendar-day > time { position: relative; z-index: 2; display: grid; width: 27px; height: 27px; place-items: center; margin-bottom: 7px; border-radius: 50%; font-size: 12px; font-weight: 700; pointer-events: none; }
 .admin-calendar-day.is-today > time { color: #fff; background: var(--admin-blue); }
 .admin-calendar-day.is-outside { color: #acb8c0; background: #fafbfb; }
+.admin-calendar-events { position: relative; z-index: 2; }
 .calendar-event { display: grid; gap: 1px; margin-top: 6px; padding: 7px 8px; color: #245c7c; background: #e4f2f8; border-left: 3px solid var(--admin-blue); border-radius: 5px; font-size: 10px; }
 .calendar-event span, .calendar-event small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .calendar-event small { opacity: .7; }

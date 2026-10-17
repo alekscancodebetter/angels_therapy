@@ -54,6 +54,16 @@ class AppointmentManagementTest extends TestCase
         $this->assertSame(4, substr_count($response->getContent(), 'data-admin-dropdown '));
     }
 
+    public function test_calendar_date_is_preselected_in_new_appointment_form(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->get(route('admin.appointments.create', ['date' => '2026-11-18']))
+            ->assertOk()
+            ->assertSee('name="appointment_date" value="2026-11-18"', false);
+    }
+
     public function test_admin_can_schedule_and_update_appointment(): void
     {
         $admin = User::factory()->admin()->create();

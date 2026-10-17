@@ -51,6 +51,8 @@ class AdminDashboardTest extends TestCase
             ->assertOk()
             ->assertSee('November 2026')
             ->assertSee('Olivia Brown')
-            ->assertSee('14:30');
+            ->assertSee('14:30')
+            ->assertSee(route('admin.appointments.create', ['date' => '2026-11-18']), false)
+            ->assertSee('New appointment on Wednesday, 18 November 2026');
     }
 }
