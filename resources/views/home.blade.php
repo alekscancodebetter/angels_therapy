@@ -1,28 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @php
+        $canonicalUrl = rtrim((string) config('app.canonical_url'), '/').route('home', [], false);
+    @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="title" content="Angel Touch Therapy | Massage Therapy in Harrogate">
     <meta name="description" content="Angel Touch Therapy in Harrogate offers sports massage, deep tissue massage, Swedish massage and full body massage with Villy, a qualified and fully insured therapist.">
     <meta name="theme-color" content="#2f6f9f">
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Angel Touch Therapy">
+    <meta property="og:locale" content="en_GB">
     <meta property="og:title" content="Angel Touch Therapy | Massage Therapy in Harrogate">
     <meta property="og:description" content="Professional massage therapy in Harrogate with Villy, a qualified and fully insured therapist.">
-    <meta property="og:url" content="{{ route('home') }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
     <meta property="og:image" content="{{ asset('images/angel-touch-hero.png') }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Angel Touch Therapy | Massage Therapy in Harrogate">
+    <meta name="twitter:description" content="Professional massage therapy in Harrogate with Villy, a qualified and fully insured therapist.">
+    <meta name="twitter:image" content="{{ asset('images/angel-touch-hero.png') }}">
     <title>Angel Touch Therapy | Massage Therapy in Harrogate</title>
-    <link rel="canonical" href="{{ route('home') }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/angel-touch-mark.png') }}">
-    <link rel="preload" href="{{ asset('images/angel-touch-hero.png') }}" as="image" fetchpriority="high">
-    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
+    @include('favicons')
+    <link
+        rel="preload"
+        href="{{ asset('images/angel-touch-hero-1280.webp') }}"
+        as="image"
+        type="image/webp"
+        imagesrcset="{{ asset('images/angel-touch-hero-768.webp') }} 768w, {{ asset('images/angel-touch-hero-1280.webp') }} 1280w, {{ asset('images/angel-touch-hero-1536.webp') }} 1536w"
+        imagesizes="100vw"
+        fetchpriority="high"
+    >
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header" data-header>
         <a class="brand" href="#top" aria-label="Angel Touch Therapy home">
-            <img class="brand__mark" src="{{ asset('images/angel-touch-mark.png') }}" alt="" width="1200" height="620">
+            <img class="brand__mark" src="{{ asset('images/angel-touch-mark.webp') }}" alt="Angel Touch Therapy logo" width="600" height="310">
             <span><strong>Angel Touch</strong><small>Therapy · Harrogate</small></span>
         </a>
 
@@ -49,14 +67,20 @@
             <a class="phone-link" href="tel:+447915910033" aria-label="Call Angel Touch Therapy on 07915 910033"><span>Call now</span><strong>07915 910 033</strong></a>
             <a class="button button--light" href="#booking">Book appointment</a>
             <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" data-menu-toggle>
-                <span></span><span></span><span></span><b>Menu</b>
+                <span></span><span></span><span></span><b data-menu-label>Open menu</b>
             </button>
         </div>
     </header>
 
     <main id="main">
         <section class="hero" id="top" aria-labelledby="hero-title">
-            <img class="hero__image" src="{{ asset('images/angel-touch-hero.png') }}" alt="A calm, warmly lit massage treatment room" width="1536" height="864">
+            <x-responsive-image
+                class="hero__image"
+                src="images/angel-touch-hero.png"
+                alt="Warm massage treatment room at Angel Touch Therapy in Harrogate"
+                sizes="100vw"
+                fetchpriority="high"
+            />
             <div class="hero__veil"></div>
             <div class="hero__content container">
                 <p class="eyebrow">Sports massage · Deep tissue · Swedish · Full body</p>
@@ -89,6 +113,7 @@
         @include('google-reviews', [
             'sectionId' => 'stories',
             'heading' => 'Real stories from Google.',
+            'reviewGroup' => 'home',
         ])
 
         <section class="treatments section" id="treatments" aria-labelledby="treatments-title">
@@ -102,7 +127,14 @@
                 <div class="treatment-grid">
                     @foreach (config('treatments') as $slug => $treatment)
                         <a class="treatment-card reveal" href="{{ route('treatments.show', $slug) }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ $treatment['title'] }} details in a new tab">
-                            <img src="{{ asset($treatment['image']) }}" alt="" loading="lazy" width="1536" height="864">
+                            <x-responsive-image
+                                src="{{ $treatment['image'] }}"
+                                alt="{{ $treatment['title'] }} treatment at Angel Touch Therapy in Harrogate"
+                                sizes="(max-width: 560px) calc(100vw - 36px), (max-width: 820px) calc(50vw - 27px), 58vw"
+                                loading="lazy"
+                                decoding="async"
+                                fetchpriority="low"
+                            />
                             <span class="treatment-card__shade"></span>
                             <span class="treatment-card__number">{{ $treatment['number'] }}</span>
                             <span class="treatment-card__content">
@@ -114,9 +146,15 @@
                     @endforeach
                 </div>
 
+                <div class="treatment-pricing reveal" aria-label="Massage prices">
+                    @foreach (config('booking.duration_options') as $duration => $option)
+                        <article><small>{{ $option['label'] }}</small><strong>£{{ $option['price'] }}</strong><span>Every massage treatment</span></article>
+                    @endforeach
+                    <article class="treatment-pricing__package"><small>{{ config('booking.package.label') }}</small><strong>£{{ config('booking.package.price') }}</strong><span>{{ config('booking.package.note') }}</span></article>
+                </div>
                 <div class="treatments__note reveal">
                     <span>Full consultation included</span>
-                    <span>Packages available at a discounted price</span>
+                    <span>Package sessions are booked individually</span>
                 </div>
             </div>
         </section>
@@ -140,7 +178,17 @@
         </section>
 
         <section class="about section" id="about" aria-labelledby="about-title">
-            <div class="about__image reveal" role="img" aria-label="Warm, calm massage treatment room"></div>
+            <div class="about__image reveal">
+                <x-responsive-image
+                    class="about__image-media"
+                    src="images/angel-touch-hero.png"
+                    alt="Warm massage treatment room at Angel Touch Therapy in Harrogate"
+                    sizes="(max-width: 820px) 100vw, 50vw"
+                    loading="lazy"
+                    decoding="async"
+                    fetchpriority="low"
+                />
+            </div>
             <div class="about__content reveal">
                 <p class="eyebrow eyebrow--gold">About Angel Touch Therapy</p>
                 <h2 id="about-title">Qualified, insured and practising since 2011.</h2>
@@ -156,12 +204,13 @@
                     </ul>
                 </div>
                 <a class="fht-link" href="https://www.fht.org.uk/" target="_blank" rel="noopener noreferrer">
-                    <img src="{{ asset('images/fht-logo.png') }}" alt="Federation of Holistic Therapists logo" width="243" height="95">
+                    <img src="{{ asset('images/fht-logo.png') }}" alt="Federation of Holistic Therapists logo" loading="lazy" decoding="async" width="243" height="95">
                     <span class="fht-link__copy">
                         <small>Professional member</small>
                         <strong>Federation of Holistic Therapists</strong>
                     </span>
                     <b aria-hidden="true">↗</b>
+                    <span class="visually-hidden">Opens in a new tab</span>
                 </a>
             </div>
         </section>
@@ -194,13 +243,66 @@
                         ];
                     @endphp
                     @foreach ($videos as [$videoId, $name])
-                        <button class="video-card" type="button" data-video="{{ $videoId }}" aria-label="Play {{ $name }}'s review">
-                            <img src="https://i.ytimg.com/vi/{{ $videoId }}/hqdefault.jpg" alt="" loading="lazy" width="480" height="360">
-                            <span class="video-card__play" aria-hidden="true">▶</span>
-                            <span class="video-card__caption"><b>{{ $name }}</b><small>Video review</small></span>
-                        </button>
+                        <div class="video-card" data-video-card>
+                            <button class="video-card__trigger" type="button" data-video="{{ $videoId }}" aria-label="Play {{ $name }}'s video review">
+                                <img src="https://i.ytimg.com/vi/{{ $videoId }}/hqdefault.jpg" alt="{{ $name }} video review thumbnail" loading="lazy" decoding="async" fetchpriority="low" width="480" height="360">
+                                <span class="video-card__play" aria-hidden="true">▶</span>
+                                <span class="video-card__caption"><b>{{ $name }}</b><small>Video review</small></span>
+                            </button>
+                        </div>
                     @endforeach
                 </div>
+            </div>
+        </section>
+
+        <section class="faq section section--ivory" id="faq" aria-labelledby="faq-title">
+            <div class="container">
+                <div class="faq__layout">
+                    <header class="faq__intro reveal">
+                        <p class="eyebrow eyebrow--gold">Before your visit</p>
+                        <h2 id="faq-title">Frequently asked questions.</h2>
+                        <p>Everything you need to feel comfortable choosing and booking your treatment.</p>
+                    </header>
+
+                    <div class="faq-list reveal">
+                        <details>
+                            <summary>Which massage should I choose?</summary>
+                            <p>Choose the treatment that sounds closest to what you need. Every appointment includes a consultation, so Villy can discuss your goals and tailor the treatment before it begins.</p>
+                        </details>
+                        <details>
+                            <summary>How long is a treatment and how much does it cost?</summary>
+                            <p>A {{ config('booking.duration_options.60.label') }} treatment is £{{ config('booking.duration_options.60.price') }} and a {{ config('booking.duration_options.90.label') }} treatment is £{{ config('booking.duration_options.90.price') }}. A prepaid package of {{ config('booking.package.label') }} costs £{{ config('booking.package.price') }}, with each session arranged individually.</p>
+                        </details>
+                        <details>
+                            <summary>What happens at my first appointment?</summary>
+                            <p>Your appointment begins with a private consultation about what you would like help with and any relevant health information. Villy then adapts the massage to your needs, comfort and chosen appointment length.</p>
+                        </details>
+                        <details>
+                            <summary>Can I book if I am pregnant, injured or have a medical condition?</summary>
+                            <p>Please call before booking if you are unsure whether massage is suitable. Relevant information can be discussed privately during your consultation, and you may be asked to seek advice from a qualified healthcare professional before treatment.</p>
+                        </details>
+                        <details>
+                            <summary>How do I change or cancel an appointment?</summary>
+                            <p>Call Villy on <a href="tel:+447915910033">07915 910 033</a> as soon as possible and, where you can, give at least 24 hours’ notice. Full details are available in the <a href="{{ route('terms-and-conditions') }}">Terms &amp; Conditions</a>.</p>
+                        </details>
+                        <details>
+                            <summary>Where is Angel Touch Therapy?</summary>
+                            <p>Appointments take place at NuDerma Clinic, 137 Wetherby Road, Harrogate, North Yorkshire, HG2 7AA. The practice is open Monday to Friday, 8am–7pm.</p>
+                        </details>
+                    </div>
+                </div>
+
+                <aside class="faq-cta reveal" aria-label="Book an appointment">
+                    <div>
+                        <p class="eyebrow">Ready when you are</p>
+                        <h3>Choose a time that works for you.</h3>
+                        <p>View live availability and book your massage appointment online in a few simple steps.</p>
+                    </div>
+                    <div class="faq-cta__actions">
+                        <a class="button button--gold" href="#booking">Choose an appointment</a>
+                        <a class="faq-cta__phone" href="tel:+447915910033">Prefer to talk? <strong>07915 910 033</strong></a>
+                    </div>
+                </aside>
             </div>
         </section>
 
@@ -211,12 +313,17 @@
                     <p>Tell Villy who the appointment is for, then choose a free date and time from the live practice calendar.</p>
                 </header>
 
-                @if (session('booking_status'))<div class="form-status booking-status" role="status">{{ session('booking_status') }}</div>@endif
-                @if ($errors->any())<div class="form-errors booking-status" role="alert"><p>Please check the highlighted booking details.</p></div>@endif
+                @if (session('booking_status'))<div class="form-status booking-status" role="status" aria-atomic="true">{{ session('booking_status') }}</div>@endif
+                @if ($errors->any())
+                    <div class="form-errors booking-status" id="booking-errors" role="alert" tabindex="-1" data-booking-errors>
+                        <p><strong>We could not complete your booking.</strong> Please check the highlighted details below.</p>
+                    </div>
+                @endif
 
                 @php
                     $oldStartsAt = (string) old('starts_at', '');
                     $bookingMonth = preg_match('/^\d{4}-\d{2}/', $oldStartsAt) ? substr($oldStartsAt, 0, 7) : now()->format('Y-m');
+                    $bookingDuration = (int) old('duration_minutes', config('booking.duration_minutes'));
                 @endphp
                 <form
                     class="booking-layout reveal"
@@ -235,17 +342,22 @@
                     <section class="contact-form-wrap booking-form-panel" aria-labelledby="booking-details-title">
                         <div class="booking-calendar__step booking-calendar__step--dark"><span>01</span><div><small>Your details</small><h3 id="booking-details-title">Who is the treatment for?</h3></div></div>
                         <div class="contact-form booking-form">
-                            <label><span>Treatment</span><select name="treatment_slug" required @error('treatment_slug') aria-invalid="true" @enderror><option value="">Choose your treatment</option>@foreach (config('treatments') as $slug => $treatment)<option value="{{ $slug }}" @selected(old('treatment_slug') === $slug)>{{ $treatment['title'] }}</option>@endforeach</select>@error('treatment_slug')<small>{{ $message }}</small>@enderror</label>
                             <div class="booking-form__row">
-                                <label><span>Name</span><input name="name" type="text" value="{{ old('name') }}" autocomplete="name" required @error('name') aria-invalid="true" @enderror>@error('name')<small>{{ $message }}</small>@enderror</label>
-                                <label><span>Telephone</span><input name="phone" type="tel" value="{{ old('phone') }}" autocomplete="tel" required @error('phone') aria-invalid="true" @enderror>@error('phone')<small>{{ $message }}</small>@enderror</label>
+                                <label for="treatment_slug"><span>Treatment</span><select id="treatment_slug" name="treatment_slug" required @error('treatment_slug') aria-invalid="true" aria-describedby="treatment_slug_error" @enderror><option value="">Choose your treatment</option>@foreach (config('treatments') as $slug => $treatment)<option value="{{ $slug }}" @selected(old('treatment_slug') === $slug)>{{ $treatment['title'] }}</option>@endforeach</select>@error('treatment_slug')<small id="treatment_slug_error">{{ $message }}</small>@enderror</label>
+                                <label for="duration_minutes"><span>Duration &amp; price</span><select id="duration_minutes" name="duration_minutes" required data-booking-duration @error('duration_minutes') aria-invalid="true" aria-describedby="duration_minutes_error" @enderror>@foreach (config('booking.duration_options') as $duration => $option)<option value="{{ $duration }}" @selected($bookingDuration === $duration)>{{ $option['label'] }} — £{{ $option['price'] }}</option>@endforeach</select>@error('duration_minutes')<small id="duration_minutes_error">{{ $message }}</small>@enderror</label>
                             </div>
-                            <label><span>Email address</span><input name="email" type="email" value="{{ old('email') }}" autocomplete="email" required @error('email') aria-invalid="true" @enderror>@error('email')<small>{{ $message }}</small>@enderror</label>
-                            <label><span>Anything Villy should know? <em>Optional</em></span><textarea name="message" rows="4" maxlength="2000" @error('message') aria-invalid="true" @enderror>{{ old('message') }}</textarea>@error('message')<small>{{ $message }}</small>@enderror</label>
+                            <p class="booking-package-note"><strong>Prepaid package:</strong> {{ config('booking.package.label') }} for £{{ config('booking.package.price') }}. Mention the package in your message or contact Villy to arrange it.</p>
+                            <div class="booking-form__row">
+                                <label for="name"><span>Name</span><input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required @error('name') aria-invalid="true" aria-describedby="name_error" @enderror>@error('name')<small id="name_error">{{ $message }}</small>@enderror</label>
+                                <label for="phone"><span>Telephone</span><input id="phone" name="phone" type="tel" inputmode="tel" value="{{ old('phone') }}" autocomplete="tel" required @error('phone') aria-invalid="true" aria-describedby="phone_error" @enderror>@error('phone')<small id="phone_error">{{ $message }}</small>@enderror</label>
+                            </div>
+                            <label for="email"><span>Email address</span><input id="email" name="email" type="email" inputmode="email" value="{{ old('email') }}" autocomplete="email" required @error('email') aria-invalid="true" aria-describedby="email_error" @enderror>@error('email')<small id="email_error">{{ $message }}</small>@enderror</label>
+                            <label for="message"><span>Anything Villy should know? <em>Optional</em></span><textarea id="message" name="message" rows="4" maxlength="2000" aria-describedby="message_help @error('message') message_error @enderror" @error('message') aria-invalid="true" @enderror>{{ old('message') }}</textarea><small class="booking-field-help" id="message_help">Up to 2,000 characters. Please do not include detailed medical information.</small>@error('message')<small id="message_error">{{ $message }}</small>@enderror</label>
+                            <p class="booking-privacy-note">We use your details to manage your appointment. Please do not include detailed medical information here; relevant health information can be discussed privately during your consultation. <a href="{{ route('privacy-policy') }}">Read our privacy policy.</a></p>
                         </div>
                     </section>
 
-                    <section class="booking-calendar" aria-labelledby="booking-calendar-title">
+                    <section class="booking-calendar" aria-labelledby="booking-calendar-title" @error('starts_at') aria-describedby="starts_at_error" @enderror>
                         <div class="booking-calendar__step"><span>02</span><div><small>Choose a time</small><h3 id="booking-calendar-title">Available appointments</h3></div></div>
                         <div class="booking-calendar__toolbar">
                             <button type="button" data-booking-previous aria-label="Previous month">←</button>
@@ -254,13 +366,18 @@
                         </div>
                         <div class="booking-calendar__weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
                         <div class="booking-calendar__grid" data-booking-days aria-label="Available appointment dates"></div>
-                        <div class="booking-calendar__loading" data-booking-loading role="status">Checking available appointments…</div>
+                        <div class="booking-calendar__loading" data-booking-loading role="status" aria-live="polite" aria-atomic="true">Checking available appointments…</div>
                         <div class="booking-times">
                             <div><small>Available times</small><strong data-booking-day>Choose a date above</strong></div>
                             <div class="booking-times__slots" data-booking-times><p>Select a highlighted day to see its available times.</p></div>
                         </div>
-                        <div class="selected-appointment" aria-live="polite"><small>Selected appointment</small><strong data-selected-appointment>Choose a date and time</strong></div>
-                        @error('starts_at')<small class="booking-field-error">{{ $message }}</small>@enderror
+                        <div class="selected-appointment" aria-live="polite" aria-atomic="true"><small>Selected appointment</small><strong data-selected-appointment>Choose a date and time</strong></div>
+                        @error('starts_at')<small class="booking-field-error" id="starts_at_error">{{ $message }}</small>@enderror
+                        <label class="booking-terms" for="terms_accepted">
+                            <input id="terms_accepted" name="terms_accepted" type="checkbox" value="1" required @checked(old('terms_accepted')) @error('terms_accepted') aria-invalid="true" aria-describedby="terms_accepted_error" @enderror>
+                            <span>I have read and accept the <a href="{{ route('terms-and-conditions') }}" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions<span class="visually-hidden"> (opens in a new tab)</span></a>.</span>
+                        </label>
+                        @error('terms_accepted')<small class="booking-field-error" id="terms_accepted_error">{{ $message }}</small>@enderror
                         <button class="button button--gold booking-submit" type="submit" data-booking-submit @disabled(! old('starts_at'))>Confirm appointment</button>
                     </section>
                 </form>
@@ -272,7 +389,7 @@
                     </div>
                     <div class="contact__cards">
                         <a href="tel:+447915910033"><small>Telephone</small><strong>(+44) 7915 910 033</strong></a>
-                        <a href="https://www.google.com/maps/search/?api=1&query=NuDerma+Clinic+137+Wetherby+Road+Harrogate+HG2+7AA" target="_blank" rel="noopener noreferrer">
+                        <a href="https://www.google.com/maps/search/?api=1&query=NuDerma+Clinic+137+Wetherby+Road+Harrogate+HG2+7AA" target="_blank" rel="noopener noreferrer" aria-label="Open the Angel Touch Therapy practice location in Google Maps in a new tab">
                             <small>Practice</small><strong>NuDerma Clinic<br>137 Wetherby Road<br>Harrogate, North Yorkshire<br>HG2 7AA</strong>
                         </a>
                     </div>
@@ -292,21 +409,25 @@
     <footer class="site-footer">
         <div class="container site-footer__top">
             <a class="brand brand--footer" href="#top" aria-label="Back to the top">
-                <img class="brand__mark" src="{{ asset('images/angel-touch-mark.png') }}" alt="" width="1200" height="620">
+                <img class="brand__mark" src="{{ asset('images/angel-touch-mark.webp') }}" alt="Angel Touch Therapy logo" loading="lazy" decoding="async" width="600" height="310">
                 <span><strong>Angel Touch</strong><small>Therapy · Harrogate</small></span>
             </a>
             <p>Sports Massage · Deep Tissue Massage<br>Swedish Massage · Full Body Massage</p>
             <div class="social-links">
-                <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
-                <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
-                <a href="skype:vili_spasova65?chat">Skype ↗</a>
+                <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="skype:vili_spasova65?chat">Skype</a>
             </div>
         </div>
-        <div class="container site-footer__bottom"><span>© {{ date('Y') }} Angel Touch Therapy</span><span>Professional and confidential massage therapy in Harrogate</span><button class="cookie-settings" type="button" data-cookie-settings>Cookie settings</button></div>
+        <div class="container site-footer__bottom">
+            <span>© {{ date('Y') }} Angel Touch Therapy</span>
+            <span>Professional and confidential massage therapy in Harrogate</span>
+            <div class="site-footer__legal"><a href="{{ route('privacy-policy') }}">Privacy policy</a><a href="{{ route('terms-and-conditions') }}">Terms &amp; conditions</a><button class="cookie-settings" type="button" data-cookie-settings>Cookie settings</button></div>
+        </div>
     </footer>
 
     @include('cookie-consent')
 
-    <script src="{{ asset('js/site.js') }}" defer></script>
+    <script src="{{ asset('js/site.js') }}?v={{ filemtime(public_path('js/site.js')) }}" defer></script>
 </body>
 </html>

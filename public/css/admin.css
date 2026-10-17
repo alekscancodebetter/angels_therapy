@@ -164,6 +164,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .admin-auth-body { min-height: 100vh; background: linear-gradient(135deg, #eaf5fa 0%, #f8f6f0 55%, #fff 100%); }
 .admin-auth-shell { display: grid; min-height: 100vh; grid-template-columns: minmax(360px, .95fr) minmax(430px, 1.05fr); }
 .admin-auth-brand { display: flex; flex-direction: column; justify-content: space-between; padding: 52px clamp(35px, 6vw, 90px); overflow: hidden; color: #fff; background: linear-gradient(145deg, rgba(53,111,152,.96), rgba(79,148,187,.88)), url('../images/angel-touch-hero.png') center/cover; }
+@supports (background-image: image-set(url('../images/angel-touch-hero-768.webp') 1x)) {
+    .admin-auth-brand { background-image: linear-gradient(145deg, rgba(53,111,152,.96), rgba(79,148,187,.88)), image-set(url('../images/angel-touch-hero-768.webp') 1x, url('../images/angel-touch-hero-1536.webp') 2x); }
+}
 .admin-auth-brand > a { width: 210px; padding: 8px 14px; background: #fff; border-radius: 10px; }
 .admin-auth-brand img { display: block; width: 100%; height: auto; }
 .admin-auth-brand > div { max-width: 560px; }

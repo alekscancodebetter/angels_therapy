@@ -1,28 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    @php
+        $canonicalUrl = rtrim((string) config('app.canonical_url'), '/').route('treatments.show', ['slug' => $slug], false);
+        $treatmentImageBase = preg_replace('/\.[^.]+$/', '', $treatment['image']);
+    @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="title" content="{{ $treatment['title'] }} in Harrogate | Angel Touch Therapy">
     <meta name="description" content="{{ $treatment['summary'] }} Angel Touch Therapy in Harrogate with qualified and fully insured massage therapist Villy.">
     <meta name="theme-color" content="#2f6f9f">
     <meta name="robots" content="index, follow">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Angel Touch Therapy">
+    <meta property="og:locale" content="en_GB">
     <meta property="og:title" content="{{ $treatment['title'] }} in Harrogate | Angel Touch Therapy">
     <meta property="og:description" content="{{ $treatment['summary'] }}">
-    <meta property="og:url" content="{{ route('treatments.show', $slug) }}">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
     <meta property="og:image" content="{{ asset($treatment['image']) }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $treatment['title'] }} in Harrogate | Angel Touch Therapy">
+    <meta name="twitter:description" content="{{ $treatment['summary'] }}">
+    <meta name="twitter:image" content="{{ asset($treatment['image']) }}">
     <title>{{ $treatment['title'] }} in Harrogate | Angel Touch Therapy</title>
-    <link rel="canonical" href="{{ route('treatments.show', $slug) }}">
-    <link rel="icon" type="image/png" href="{{ asset('images/angel-touch-mark.png') }}">
-    <link rel="preload" href="{{ asset($treatment['image']) }}" as="image" fetchpriority="high">
-    <link rel="stylesheet" href="{{ asset('css/site.css') }}">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
+    @include('favicons')
+    <link
+        rel="preload"
+        href="{{ asset($treatmentImageBase.'-1280.webp') }}"
+        as="image"
+        type="image/webp"
+        imagesrcset="{{ asset($treatmentImageBase.'-768.webp') }} 768w, {{ asset($treatmentImageBase.'-1280.webp') }} 1280w, {{ asset($treatmentImageBase.'-1536.webp') }} 1536w"
+        imagesizes="100vw"
+        fetchpriority="high"
+    >
+    <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
     <script type="application/ld+json">
         {!! json_encode([
             '@context' => 'https://schema.org',
             '@type' => 'Service',
             'name' => $treatment['title'],
             'description' => $treatment['summary'],
-            'url' => route('treatments.show', $slug),
+            'url' => $canonicalUrl,
             'image' => asset($treatment['image']),
             'areaServed' => [
                 '@type' => 'City',
@@ -48,7 +67,7 @@
 
     <header class="site-header site-header--solid" data-header>
         <a class="brand" href="{{ route('home') }}" aria-label="Angel Touch Therapy home">
-            <img class="brand__mark" src="{{ asset('images/angel-touch-mark.png') }}" alt="" width="1200" height="620">
+            <img class="brand__mark" src="{{ asset('images/angel-touch-mark.webp') }}" alt="Angel Touch Therapy logo" width="600" height="310">
             <span><strong>Angel Touch</strong><small>Therapy · Harrogate</small></span>
         </a>
 
@@ -75,14 +94,20 @@
             <a class="phone-link" href="tel:+447915910033" aria-label="Call Angel Touch Therapy on 07915 910033"><span>Call now</span><strong>07915 910 033</strong></a>
             <a class="button button--light" href="{{ route('home') }}#booking">Book appointment</a>
             <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" data-menu-toggle>
-                <span></span><span></span><span></span><b>Menu</b>
+                <span></span><span></span><span></span><b data-menu-label>Open menu</b>
             </button>
         </div>
     </header>
 
     <main id="main">
         <section class="treatment-hero" aria-labelledby="treatment-title">
-            <img class="treatment-hero__image" src="{{ asset($treatment['image']) }}" alt="{{ $treatment['title'] }} at Angel Touch Therapy" width="1536" height="864">
+            <x-responsive-image
+                class="treatment-hero__image"
+                src="{{ $treatment['image'] }}"
+                alt="{{ $treatment['title'] }} treatment at Angel Touch Therapy in Harrogate"
+                sizes="100vw"
+                fetchpriority="high"
+            />
             <div class="treatment-hero__shade"></div>
             <div class="container treatment-hero__content">
                 <a class="back-link" href="{{ route('home') }}#treatments">← All treatments</a>
@@ -102,10 +127,13 @@
                     <p>{{ $treatment['intro'] }}</p>
                     <p>{{ $treatment['detail'] }}</p>
                 </div>
-                <aside class="treatment-pending" aria-label="Price and duration">
-                    <span>Duration</span><strong>To be confirmed</strong>
-                    <span>Price</span><strong>To be confirmed</strong>
-                    <small>Details will be added shortly.</small>
+                <aside class="treatment-price-list" aria-label="Price and duration">
+                    <p>Prices for every massage</p>
+                    @foreach (config('booking.duration_options') as $option)
+                        <div><span>{{ $option['label'] }}</span><strong>£{{ $option['price'] }}</strong></div>
+                    @endforeach
+                    <div><span>{{ config('booking.package.label') }}</span><strong>£{{ config('booking.package.price') }}</strong></div>
+                    <small>{{ config('booking.package.note') }}. Package sessions are arranged individually.</small>
                 </aside>
             </div>
         </section>
@@ -114,6 +142,7 @@
             'sectionId' => 'treatment-reviews',
             'heading' => 'What clients say on Google.',
             'compact' => true,
+            'reviewGroup' => $slug,
         ])
 
         <section class="treatment-benefits section" aria-labelledby="suited-title">
@@ -190,7 +219,14 @@
                 <div class="related-grid">
                     @foreach ($otherTreatments as $otherSlug => $other)
                         <a class="related-card reveal" href="{{ route('treatments.show', $otherSlug) }}" target="_blank" rel="noopener noreferrer" aria-label="Open {{ $other['title'] }} details in a new tab">
-                            <img src="{{ asset($other['image']) }}" alt="" loading="lazy" width="1536" height="864">
+                            <x-responsive-image
+                                src="{{ $other['image'] }}"
+                                alt="{{ $other['title'] }} treatment at Angel Touch Therapy in Harrogate"
+                                sizes="(max-width: 560px) calc(100vw - 36px), (max-width: 820px) 50vw, 33vw"
+                                loading="lazy"
+                                decoding="async"
+                                fetchpriority="low"
+                            />
                             <span><small>{{ $other['number'] }}</small><strong>{{ $other['title'] }}</strong><b aria-hidden="true">↗</b></span>
                         </a>
                     @endforeach
@@ -202,21 +238,25 @@
     <footer class="site-footer">
         <div class="container site-footer__top">
             <a class="brand brand--footer" href="{{ route('home') }}" aria-label="Angel Touch Therapy home">
-                <img class="brand__mark" src="{{ asset('images/angel-touch-mark.png') }}" alt="" width="1200" height="620">
+                <img class="brand__mark" src="{{ asset('images/angel-touch-mark.webp') }}" alt="Angel Touch Therapy logo" loading="lazy" decoding="async" width="600" height="310">
                 <span><strong>Angel Touch</strong><small>Therapy · Harrogate</small></span>
             </a>
             <p>Sports Massage · Deep Tissue Massage<br>Swedish Massage · Full Body Massage</p>
             <div class="social-links">
-                <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
-                <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube ↗</a>
-                <a href="skype:vili_spasova65?chat">Skype ↗</a>
+                <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="skype:vili_spasova65?chat">Skype</a>
             </div>
         </div>
-        <div class="container site-footer__bottom"><span>© {{ date('Y') }} Angel Touch Therapy</span><span>Professional and confidential massage therapy in Harrogate</span><button class="cookie-settings" type="button" data-cookie-settings>Cookie settings</button></div>
+        <div class="container site-footer__bottom">
+            <span>© {{ date('Y') }} Angel Touch Therapy</span>
+            <span>Professional and confidential massage therapy in Harrogate</span>
+            <div class="site-footer__legal"><a href="{{ route('privacy-policy') }}">Privacy policy</a><a href="{{ route('terms-and-conditions') }}">Terms &amp; conditions</a><button class="cookie-settings" type="button" data-cookie-settings>Cookie settings</button></div>
+        </div>
     </footer>
 
     @include('cookie-consent')
 
-    <script src="{{ asset('js/site.js') }}" defer></script>
+    <script src="{{ asset('js/site.js') }}?v={{ filemtime(public_path('js/site.js')) }}" defer></script>
 </body>
 </html>

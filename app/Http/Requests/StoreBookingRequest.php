@@ -23,10 +23,27 @@ class StoreBookingRequest extends FormRequest
         return [
             'starts_at' => ['required', 'date_format:Y-m-d\TH:i'],
             'treatment_slug' => ['required', 'string', Rule::in(array_keys(config('treatments')))],
+            'duration_minutes' => ['required', 'integer', Rule::in(array_keys(config('booking.duration_options')))],
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email:rfc', 'max:190'],
             'phone' => ['required', 'string', 'max:40'],
             'message' => ['nullable', 'string', 'max:2000'],
+            'terms_accepted' => ['accepted'],
+        ];
+    }
+
+    /** @return array<string, string> */
+    public function messages(): array
+    {
+        return [
+            'starts_at.required' => 'Please choose an appointment time.',
+            'treatment_slug.required' => 'Please choose a treatment.',
+            'duration_minutes.required' => 'Please choose a treatment duration.',
+            'name.required' => 'Please enter your name.',
+            'email.required' => 'Please enter your email address.',
+            'email.email' => 'Please enter a valid email address.',
+            'phone.required' => 'Please enter your telephone number.',
+            'terms_accepted.accepted' => 'Please accept the terms and conditions before booking.',
         ];
     }
 
@@ -35,7 +52,7 @@ class StoreBookingRequest extends FormRequest
     {
         return [
             function (Validator $validator): void {
-                if ($validator->errors()->has('starts_at')) {
+                if ($validator->errors()->hasAny(['starts_at', 'duration_minutes'])) {
                     return;
                 }
 
@@ -45,7 +62,7 @@ class StoreBookingRequest extends FormRequest
                     config('app.timezone'),
                 );
 
-                if (! Appointment::isBookableStart($startsAt)) {
+                if (! Appointment::isBookableStart($startsAt, $this->integer('duration_minutes'))) {
                     $validator->errors()->add('starts_at', 'Choose one of the available appointment times.');
                 }
             },

@@ -6,13 +6,13 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#4f94bb">
     <title>@yield('title', 'Admin') | Angel Touch Therapy</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/angel-touch-mark.png') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    @include('favicons')
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
 </head>
 <body class="admin-body">
     <aside class="admin-sidebar" id="admin-sidebar" data-admin-sidebar>
         <a class="admin-brand" href="{{ route('admin.dashboard') }}">
-            <img src="{{ asset('images/angel-touch-mark.png') }}" alt="" width="1200" height="620">
+            <img src="{{ asset('images/angel-touch-mark.webp') }}" alt="Angel Touch Therapy logo" width="600" height="310">
             <span><strong>Angel Touch</strong><small>Practice admin</small></span>
         </a>
 
@@ -57,6 +57,6 @@
         </div>
     </main>
 
-    <script src="{{ asset('js/admin.js') }}" defer></script>
+    <script src="{{ asset('js/admin.js') }}?v={{ filemtime(public_path('js/admin.js')) }}" defer></script>
 </body>
 </html>

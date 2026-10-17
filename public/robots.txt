@@ -1,3 +1,8 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /appointments/availability
+Disallow: /appointment-request
+Disallow: /bookings
+
 Sitemap: https://angeltouchtherapy.co.uk/sitemap.xml

@@ -6,13 +6,13 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#4f94bb">
     <title>@yield('title') | Angel Touch Therapy</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/angel-touch-mark.png') }}">
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    @include('favicons')
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
 </head>
 <body class="admin-auth-body">
     <main class="admin-auth-shell">
         <section class="admin-auth-brand">
-            <a href="{{ route('home') }}"><img src="{{ asset('images/angel-touch-logo.png') }}" alt="Angel Touch Therapy" width="1536" height="1024"></a>
+            <a href="{{ route('home') }}"><img src="{{ asset('images/angel-touch-logo.webp') }}" alt="Angel Touch Therapy" width="768" height="512"></a>
             <div>
                 <p class="admin-eyebrow">PRIVATE PRACTICE AREA</p>
                 <h1>Calm practice management, all in one place.</h1>
@@ -23,5 +23,6 @@
             @yield('content')
         </section>
     </main>
+    <script src="{{ asset('js/admin.js') }}?v={{ filemtime(public_path('js/admin.js')) }}" defer></script>
 </body>
 </html>

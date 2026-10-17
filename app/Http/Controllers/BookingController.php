@@ -26,7 +26,7 @@ class BookingController extends Controller
             $validated['starts_at'],
             config('app.timezone'),
         );
-        $durationMinutes = (int) config('booking.duration_minutes');
+        $durationMinutes = (int) $validated['duration_minutes'];
 
         try {
             $appointmentCreated = Cache::lock('appointment-booking-'.$startsAt->format('Y-m-d'), 10)->block(5, function () use ($validated, $startsAt, $durationMinutes): bool {
@@ -68,7 +68,7 @@ class BookingController extends Controller
 
         return redirect(route('home').'#booking')->with(
             'booking_status',
-            'Your treatment is booked for '.$startsAt->format('l, j F').' at '.$startsAt->format('g:i A').'.',
+            'Your '.$durationMinutes.'-minute treatment is booked for '.$startsAt->format('l, j F').' at '.$startsAt->format('g:i A').'.',
         );
     }
 }

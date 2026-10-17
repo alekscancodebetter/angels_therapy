@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 class AppointmentAvailabilityController extends Controller
@@ -14,7 +15,9 @@ class AppointmentAvailabilityController extends Controller
     {
         $validated = $request->validate([
             'month' => ['required', 'date_format:Y-m'],
+            'duration_minutes' => ['nullable', 'integer', Rule::in(array_keys(config('booking.duration_options')))],
         ]);
+        $durationMinutes = (int) ($validated['duration_minutes'] ?? config('booking.duration_minutes'));
         $month = CarbonImmutable::createFromFormat('Y-m', $validated['month'], config('app.timezone'))->startOfMonth();
         $currentMonth = CarbonImmutable::now(config('app.timezone'))->startOfMonth();
         $lastMonth = CarbonImmutable::now(config('app.timezone'))
@@ -32,7 +35,8 @@ class AppointmentAvailabilityController extends Controller
             'label' => $month->format('F Y'),
             'previous_month' => $month->gt($currentMonth) ? $month->subMonth()->format('Y-m') : null,
             'next_month' => $month->lt($lastMonth) ? $month->addMonth()->format('Y-m') : null,
-            'days' => Appointment::availableSlotsForMonth($month),
-        ]);
+            'duration_minutes' => $durationMinutes,
+            'days' => Appointment::availableSlotsForMonth($month, $durationMinutes),
+        ])->header('Cache-Control', 'no-store, no-cache, must-revalidate');
     }
 }

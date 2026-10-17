@@ -17,7 +17,8 @@ class AdminAuthenticationTest extends TestCase
 
         $this->get(route('admin.setup'))
             ->assertOk()
-            ->assertSee('Create your secure admin account.');
+            ->assertSee('Create your secure admin account.')
+            ->assertSee('js/admin.js?v=', false);
     }
 
     public function test_valid_setup_creates_admin_and_signs_them_in(): void
