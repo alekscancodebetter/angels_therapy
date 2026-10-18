@@ -20,6 +20,8 @@
     <title>Booking confirmed | Angel Touch Therapy</title>
     <link rel="canonical" href="{{ $canonicalUrl }}">
     @include('favicons')
+    @include('google-ads', ['bookingCompleted' => true])
+    @include('meta-ads', ['bookingCompleted' => true])
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
 </head>
 <body class="confirmation-page">

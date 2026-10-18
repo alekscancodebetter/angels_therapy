@@ -25,6 +25,8 @@
     <title>{{ $treatment['title'] }} in Harrogate | Angel Touch Therapy</title>
     <link rel="canonical" href="{{ $canonicalUrl }}">
     @include('favicons')
+    @include('google-ads', ['bookingCompleted' => false])
+    @include('meta-ads', ['bookingCompleted' => false])
     <link
         rel="preload"
         href="{{ asset($treatmentImageBase.'-1280.webp') }}"

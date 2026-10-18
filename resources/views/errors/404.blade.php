@@ -9,6 +9,8 @@
     <meta name="robots" content="noindex, follow">
     <title>Page Not Found | Angel Touch Therapy</title>
     @include('favicons')
+    @include('google-ads', ['bookingCompleted' => false])
+    @include('meta-ads', ['bookingCompleted' => false])
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
 </head>
 <body class="error-page">

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class HomePageTest extends TestCase
@@ -51,8 +52,40 @@ class HomePageTest extends TestCase
             ->assertSee('Cookies, with your consent.')
             ->assertSee('Essential cookies')
             ->assertSee('External media')
+            ->assertSee('Advertising and measurement')
             ->assertSee('Use essential only')
             ->assertSee('Accept all');
+    }
+
+    public function test_advertising_configuration_is_rendered_only_when_tag_ids_are_configured(): void
+    {
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertDontSee('google-ads-config', false)
+            ->assertDontSee('meta-ads-config', false);
+
+        Config::set('google_ads.tag_id', 'AW-123456789');
+        Config::set('google_ads.booking_conversion_label', 'booking-label');
+        Config::set('meta_ads.pixel_id', '123456789');
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('google-ads-config', false)
+            ->assertSee('meta-ads-config', false)
+            ->assertSee('AW-123456789', false)
+            ->assertSee('booking-label', false)
+            ->assertSee('123456789', false);
+
+        $this->withSession([
+            'booking_confirmation' => [
+                'duration' => 60,
+                'date' => 'Friday, 16 October',
+                'time' => '10:00 AM',
+            ],
+        ])->get(route('booking-confirmation'))
+            ->assertOk()
+            ->assertSee('bookingCompleted: true', false)
+            ->assertSee('meta-ads-config', false);
     }
 
     public function test_google_reviews_appear_near_the_top_of_the_page_and_link_to_google(): void

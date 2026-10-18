@@ -24,6 +24,8 @@
     <title>Privacy Policy | Angel Touch Therapy</title>
     <link rel="canonical" href="{{ $canonicalUrl }}">
     @include('favicons')
+    @include('google-ads', ['bookingCompleted' => false])
+    @include('meta-ads', ['bookingCompleted' => false])
     <link rel="stylesheet" href="{{ asset('css/site.css') }}?v={{ filemtime(public_path('css/site.css')) }}">
 </head>
 <body class="privacy-page">
@@ -69,7 +71,7 @@
                 <p class="eyebrow">Your information</p>
                 <h1 id="privacy-title">Privacy Policy</h1>
                 <p>This notice explains how Angel Touch Therapy collects, uses, stores and protects your personal information.</p>
-                <p class="privacy-hero__updated">Last updated: <time datetime="2026-10-16">16 October 2026</time></p>
+                <p class="privacy-hero__updated">Last updated: <time datetime="2026-10-18">18 October 2026</time></p>
             </div>
         </section>
 
@@ -93,8 +95,10 @@
                     <section id="who-we-are">
                         <p class="privacy-section-number">01</p>
                         <h2>Who we are</h2>
-                        <p>Angel Touch Therapy is the controller responsible for the personal information described in this policy.</p>
+                        <p>Ms Violina Todorova Spasova is the person responsible for data protection and acts as the controller for the personal information described in this policy on behalf of Angel Touch Therapy.</p>
                         <div class="privacy-contact-card">
+                            <strong>Ms Violina Todorova Spasova</strong>
+                            <span>Data protection contact</span>
                             <strong>Angel Touch Therapy</strong>
                             <span>NuDerma Clinic</span>
                             <span>137 Wetherby Road</span>
@@ -157,8 +161,8 @@
                     <section id="cookies">
                         <p class="privacy-section-number">05</p>
                         <h2>Cookies, browser storage and external content</h2>
-                        <p>The website uses strictly necessary session and security cookies so that forms and the administration area work securely. Your cookie preference is saved in your browser’s local storage under <code>angel-touch-cookie-consent-v1</code>. You can remove it through your browser settings or reopen the notice using the “Cookie settings” button in the footer.</p>
-                        <p>We do not use advertising or analytics cookies. Video preview images are supplied by YouTube. A privacy-enhanced YouTube player is loaded only after you choose to play a video; YouTube may then receive technical information and set or access its own storage. Links to Google Maps, Google Reviews, Instagram and YouTube take you to services with their own privacy policies.</p>
+                        <p>The website uses strictly necessary session and security cookies so that forms and the administration area work securely. Your cookie preference is saved in your browser’s local storage under <code>angel-touch-cookie-consent-v3</code>. You can remove it through your browser settings or reopen the notice using the “Cookie settings” button in the footer.</p>
+                        <p>We do not use analytics cookies. If you choose “Accept all”, the website may load the Google Ads tag and Meta Pixel to measure advertising visits, completed bookings and phone-link clicks. Google and Meta may use advertising cookies, ad-click information and related technical data for conversion measurement and, where permitted by your settings, personalised advertising. If you choose “Use essential only”, these advertising tags are not loaded. Video preview images are supplied by YouTube. A privacy-enhanced YouTube player is loaded only after you choose to play a video; YouTube may then receive technical information and set or access its own storage. Links to Google Maps, Google Reviews, Instagram and YouTube take you to services with their own privacy policies.</p>
                     </section>
 
                     <section id="retention">

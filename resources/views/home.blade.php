@@ -24,6 +24,8 @@
     <title>Angel Touch Therapy | Massage Therapy in Harrogate</title>
     <link rel="canonical" href="{{ $canonicalUrl }}">
     @include('favicons')
+    @include('google-ads', ['bookingCompleted' => false])
+    @include('meta-ads', ['bookingCompleted' => false])
     <link
         rel="preload"
         href="{{ asset('images/angel-touch-hero-1280.webp') }}"
@@ -116,10 +118,10 @@
             'reviewGroup' => 'home',
         ])
 
-        <section class="treatments section" id="treatments" aria-labelledby="treatments-title">
+        <section class="treatments section" aria-labelledby="treatments-title">
             <div class="container">
                 <div class="treatments__intro reveal">
-                    <p class="eyebrow eyebrow--gold">Massage treatments</p>
+                    <p class="eyebrow eyebrow--gold anchor-target" id="treatments">Massage treatments</p>
                     <h2 id="treatments-title">Choose the treatment<br>that feels right for you.</h2>
                     <p>Every treatment includes a full consultation, allowing Villy to tailor the therapy to your needs. Select a massage to learn more.</p>
                 </div>
@@ -177,7 +179,7 @@
             </div>
         </section>
 
-        <section class="about section" id="about" aria-labelledby="about-title">
+        <section class="about section" aria-labelledby="about-title">
             <div class="about__image reveal">
                 <x-responsive-image
                     class="about__image-media"
@@ -190,7 +192,7 @@
                 />
             </div>
             <div class="about__content reveal">
-                <p class="eyebrow eyebrow--gold">About Angel Touch Therapy</p>
+                <p class="eyebrow eyebrow--gold anchor-target" id="about">About Angel Touch Therapy</p>
                 <h2 id="about-title">Qualified, insured and practising since 2011.</h2>
                 <p>Angel Touch Therapy is owned and represented by Villy, a qualified and fully insured massage therapist offering sports massage, deep tissue massage, and stress and tension release massage therapy.</p>
                 <p>Villy has provided a wide range of complementary therapies at reasonable rates since 2011. Her practice is available to people of all ages — from pre-natal and ante-natal care through birthing assistance, to children, adults and the elderly — with a professional and confidential service.</p>
@@ -255,11 +257,11 @@
             </div>
         </section>
 
-        <section class="faq section section--ivory" id="faq" aria-labelledby="faq-title">
+        <section class="faq section section--ivory" aria-labelledby="faq-title">
             <div class="container">
-                <div class="faq__layout">
+                <div class="faq__layout" id="faq">
                     <header class="faq__intro reveal">
-                        <p class="eyebrow eyebrow--gold">Before your visit</p>
+                        <p class="eyebrow eyebrow--gold anchor-target">Before your visit</p>
                         <h2 id="faq-title">Frequently asked questions.</h2>
                         <p>Everything you need to feel comfortable choosing and booking your treatment.</p>
                     </header>
@@ -306,10 +308,10 @@
             </div>
         </section>
 
-        <section class="contact section section--forest" id="booking" aria-labelledby="booking-title">
+        <section class="contact section section--forest" aria-labelledby="booking-title">
             <div class="container">
                 <header class="booking-heading reveal">
-                    <div><p class="eyebrow">Book online</p><h2 id="booking-title">Book your treatment.</h2></div>
+                    <div><p class="eyebrow anchor-target" id="booking">Book online</p><h2 id="booking-title">Book your treatment.</h2></div>
                     <p>Tell Villy who the appointment is for, then choose a free date and time from the live practice calendar.</p>
                 </header>
 
@@ -416,9 +418,9 @@
                     </section>
                 </form>
 
-                <div class="practice-info reveal" id="contact">
+                <div class="practice-info reveal">
                     <div class="contact__details">
-                        <p class="eyebrow">Practice details</p><h2 id="contact-title">Everything you need for your visit.</h2>
+                        <p class="eyebrow anchor-target" id="contact">Practice details</p><h2 id="contact-title">Everything you need for your visit.</h2>
                         <p>Your selected appointment will also appear in Villy’s admin calendar immediately.</p>
                     </div>
                     <div class="contact__cards">

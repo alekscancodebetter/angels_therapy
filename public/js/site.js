@@ -6,6 +6,17 @@
     const opensOnHover = () => desktopHover.matches && window.innerWidth > 820;
     const isMobileNavigation = () => window.innerWidth <= 820;
 
+    const updateAnchorOffset = () => {
+        if (!header) return;
+
+        const headerTop = parseFloat(getComputedStyle(header).getPropertyValue('--header-scrolled-top'));
+        const offset = Math.ceil(header.getBoundingClientRect().height + headerTop + 12);
+        document.documentElement.style.setProperty('--anchor-offset', `${offset}px`);
+    };
+    updateAnchorOffset();
+    if (header && 'ResizeObserver' in window) new ResizeObserver(updateAnchorOffset).observe(header);
+    window.addEventListener('resize', updateAnchorOffset, { passive: true });
+
     const updateHeader = () => header?.classList.toggle('is-scrolled', window.scrollY > 24);
     let headerUpdatePending = false;
     const requestHeaderUpdate = () => {
@@ -811,7 +822,142 @@
     });
 
     const cookieConsent = document.querySelector('[data-cookie-consent]');
-    const cookieConsentStorageKey = 'angel-touch-cookie-consent-v1';
+    const cookieConsentStorageKey = 'angel-touch-cookie-consent-v3';
+    const googleAds = window.angelTouchGoogleAds;
+    const metaAds = window.angelTouchMetaAds;
+    let googleAdsConsentGranted = false;
+    let googleAdsLoaded = false;
+    let bookingConversionSent = false;
+    let metaAdsConsentGranted = false;
+    let metaAdsLoaded = false;
+    let metaBookingEventSent = false;
+
+    const sendGoogleAdsConversion = (label, value, currency) => {
+        if (!googleAdsConsentGranted || !googleAds?.tagId || !label || typeof window.gtag !== 'function') return;
+
+        const conversion = {
+            send_to: googleAds.tagId + '/' + label,
+        };
+        const numericValue = value === null || value === '' || typeof value === 'undefined'
+            ? null
+            : Number(value);
+
+        if (numericValue !== null && Number.isFinite(numericValue)) conversion.value = numericValue;
+        if (currency) conversion.currency = currency;
+
+        window.gtag('event', 'conversion', conversion);
+    };
+
+    const loadGoogleAds = () => {
+        if (!googleAds?.tagId || googleAdsLoaded) return;
+
+        window.dataLayer = window.dataLayer || [];
+        window.gtag = window.gtag || function () {
+            window.dataLayer.push(arguments);
+        };
+        googleAdsConsentGranted = true;
+        window.gtag('consent', 'default', {
+            ad_storage: 'denied',
+            analytics_storage: 'denied',
+            ad_user_data: 'denied',
+            ad_personalization: 'denied',
+            functionality_storage: 'granted',
+            security_storage: 'granted',
+            wait_for_update: 500,
+        });
+        window.gtag('consent', 'update', {
+            ad_storage: 'granted',
+            analytics_storage: 'denied',
+            ad_user_data: 'granted',
+            ad_personalization: 'granted',
+        });
+        window.gtag('js', new Date());
+        window.gtag('config', googleAds.tagId);
+        googleAdsLoaded = true;
+
+        if (!document.querySelector('script[data-google-ads-tag]')) {
+            const googleAdsScript = document.createElement('script');
+            googleAdsScript.async = true;
+            googleAdsScript.dataset.googleAdsTag = 'true';
+            googleAdsScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(googleAds.tagId);
+            document.head.appendChild(googleAdsScript);
+        }
+
+        if (googleAds.bookingCompleted && !bookingConversionSent) {
+            bookingConversionSent = true;
+            sendGoogleAdsConversion(
+                googleAds.bookingConversionLabel,
+                googleAds.bookingConversionValue,
+                googleAds.bookingConversionCurrency,
+            );
+        }
+    };
+
+    const sendMetaAdsEvent = (eventName, value, currency) => {
+        if (!metaAdsConsentGranted || !metaAds?.pixelId || !eventName || typeof window.fbq !== 'function') return;
+
+        const eventParameters = {};
+        const numericValue = value === null || value === '' || typeof value === 'undefined'
+            ? null
+            : Number(value);
+
+        if (numericValue !== null && Number.isFinite(numericValue)) eventParameters.value = numericValue;
+        if (currency) eventParameters.currency = currency;
+
+        window.fbq('track', eventName, eventParameters);
+    };
+
+    const loadMetaAds = () => {
+        if (!metaAds?.pixelId || metaAdsLoaded) return;
+
+        window.fbq = window.fbq || function () {
+            window.fbq.callMethod
+                ? window.fbq.callMethod.apply(window.fbq, arguments)
+                : window.fbq.queue.push(arguments);
+        };
+        window._fbq = window.fbq;
+        window.fbq.push = window.fbq;
+        window.fbq.loaded = true;
+        window.fbq.version = '2.0';
+        window.fbq.queue = [];
+        metaAdsConsentGranted = true;
+        window.fbq('init', metaAds.pixelId);
+        window.fbq('track', 'PageView');
+        metaAdsLoaded = true;
+
+        if (!document.querySelector('script[data-meta-ads-pixel]')) {
+            const metaAdsScript = document.createElement('script');
+            metaAdsScript.async = true;
+            metaAdsScript.dataset.metaAdsPixel = 'true';
+            metaAdsScript.src = 'https://connect.facebook.net/en_US/fbevents.js';
+            document.head.appendChild(metaAdsScript);
+        }
+
+        if (metaAds.bookingCompleted && !metaBookingEventSent) {
+            metaBookingEventSent = true;
+            sendMetaAdsEvent(
+                metaAds.bookingEventName,
+                metaAds.bookingEventValue,
+                metaAds.bookingEventCurrency,
+            );
+        }
+    };
+
+    const loadAdvertisingTags = () => {
+        loadGoogleAds();
+        loadMetaAds();
+    };
+
+    document.querySelectorAll('a[href^="tel:"]').forEach((phoneLink) => {
+        phoneLink.addEventListener('click', () => {
+            sendGoogleAdsConversion(
+                googleAds?.phoneConversionLabel,
+                googleAds?.phoneConversionValue,
+                googleAds?.phoneConversionCurrency,
+            );
+            sendMetaAdsEvent(metaAds?.phoneEventName);
+        });
+    });
 
     if (cookieConsent) {
         const cookieConsentPanel = cookieConsent.querySelector('[role="dialog"]');
@@ -852,6 +998,8 @@
 
         if (!savedCookieChoice) {
             showCookieConsent();
+        } else if (savedCookieChoice === 'all') {
+            loadAdvertisingTags();
         }
 
         cookieConsent.querySelectorAll('[data-cookie-choice]').forEach((button) => {
@@ -862,6 +1010,7 @@
                     // The choice still applies for this page when browser storage is unavailable.
                 }
 
+                if (button.dataset.cookieChoice === 'all') loadAdvertisingTags();
                 hideCookieConsent();
             });
         });

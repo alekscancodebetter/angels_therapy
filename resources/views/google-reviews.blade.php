@@ -16,11 +16,11 @@
     }
 @endphp
 
-<section @class(['google-reviews', 'section', 'google-reviews--compact' => $isCompact]) @if ($sectionId) id="{{ $sectionId }}" @endif aria-labelledby="{{ $headingId }}">
+<section @class(['google-reviews', 'section', 'google-reviews--compact' => $isCompact]) aria-labelledby="{{ $headingId }}">
     <div class="container">
         <div class="google-reviews__heading reveal">
             <div>
-                <p class="eyebrow eyebrow--gold">Verified on Google</p>
+                <p class="eyebrow eyebrow--gold anchor-target" @if ($sectionId) id="{{ $sectionId }}" @endif>Verified on Google</p>
                 <h2 id="{{ $headingId }}">{{ $heading }}</h2>
             </div>
             <div class="google-reviews__summary">
