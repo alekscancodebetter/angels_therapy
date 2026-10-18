@@ -224,37 +224,126 @@
         password: 'Please enter your password.',
         password_confirmation: 'Please confirm your password.',
     };
+    const englishValidationMessage = (field) => {
+        if (field.validity.valueMissing) {
+            return requiredFieldMessages[field.name] || 'Please complete this field.';
+        }
+
+        if (field.validity.typeMismatch && field.type === 'email') {
+            return 'Please enter a valid email address.';
+        }
+
+        if (field.validity.typeMismatch && field.type === 'url') {
+            return 'Please enter a valid web address.';
+        }
+
+        if (field.validity.tooShort) {
+            return `Please use at least ${field.minLength} characters.`;
+        }
+
+        if (field.validity.tooLong) {
+            return `Please use no more than ${field.maxLength} characters.`;
+        }
+
+        if (field.validity.patternMismatch) {
+            return 'Please use the requested format.';
+        }
+
+        if (field.validity.rangeUnderflow) {
+            return `Please enter a value of at least ${field.min}.`;
+        }
+
+        if (field.validity.rangeOverflow) {
+            return `Please enter a value of no more than ${field.max}.`;
+        }
+
+        if (field.validity.stepMismatch && field.name === 'starts_at') {
+            return 'Please choose a time from the list.';
+        }
+
+        if (field.validity.stepMismatch) {
+            return 'Please choose a valid increment.';
+        }
+
+        if (field.validity.badInput) {
+            return 'Please enter a valid value.';
+        }
+
+        return 'Please check this field.';
+    };
+
+    const phoneFields = [...document.querySelectorAll('[data-phone-field]')];
+    const selectedPhoneCountry = (phoneField) => phoneField.querySelector('[data-phone-country-option]:checked');
+    const phoneNationalDigits = (number, countryOption) => {
+        const trimmedNumber = number.trim();
+        let digits = trimmedNumber.replace(/\D/g, '');
+        const dialDigits = countryOption.dataset.phoneDialCode.replace(/\D/g, '');
+        const trunkPrefix = countryOption.dataset.phoneTrunkPrefix;
+
+        if (trimmedNumber.startsWith('+') && digits.startsWith(dialDigits)) {
+            digits = digits.slice(dialDigits.length);
+        } else if (digits.startsWith(`00${dialDigits}`)) {
+            digits = digits.slice(dialDigits.length + 2);
+        } else if (trunkPrefix && digits.startsWith(trunkPrefix)) {
+            digits = digits.slice(trunkPrefix.length);
+        }
+
+        return digits;
+    };
+    const applyPhoneValidity = (numberInput) => {
+        const phoneField = numberInput.closest('[data-phone-field]');
+        const countryOption = phoneField ? selectedPhoneCountry(phoneField) : null;
+        numberInput.setCustomValidity('');
+
+        if (!numberInput.value.trim() || !countryOption) return true;
+
+        const nationalDigits = phoneNationalDigits(numberInput.value, countryOption);
+        const minimumDigits = Number(countryOption.dataset.phoneMinDigits);
+        const maximumDigits = Number(countryOption.dataset.phoneMaxDigits);
+        const usesAllowedCharacters = /^[0-9+\s().-]+$/.test(numberInput.value.trim());
+        const isValid = usesAllowedCharacters
+            && nationalDigits.length >= minimumDigits
+            && nationalDigits.length <= maximumDigits;
+
+        if (!isValid) numberInput.setCustomValidity(countryOption.dataset.phoneMessage);
+
+        return isValid;
+    };
+    const syncPhoneField = (phoneField) => {
+        const countryOption = selectedPhoneCountry(phoneField);
+        const numberInput = phoneField.querySelector('[data-phone-number]');
+        const helpText = phoneField.querySelector('[data-phone-help]');
+        if (!countryOption || !numberInput) return;
+
+        numberInput.placeholder = countryOption.dataset.phonePlaceholder;
+        if (helpText) {
+            helpText.textContent = `${countryOption.dataset.phoneCountryLabel} ${countryOption.dataset.phoneDialCode}: ${countryOption.dataset.phoneMessage}`;
+        }
+        applyPhoneValidity(numberInput);
+    };
+
+    phoneFields.forEach((phoneField) => {
+        syncPhoneField(phoneField);
+        phoneField.querySelectorAll('[data-phone-country-option]').forEach((countryOption) => {
+            countryOption.addEventListener('change', () => syncPhoneField(phoneField));
+        });
+    });
 
     document.querySelectorAll('.admin-form input, .admin-form textarea, .admin-form select').forEach((field) => {
         field.addEventListener('invalid', () => {
+            const existingCustomMessage = field.validity.customError ? field.validationMessage : '';
             field.setCustomValidity('');
 
             const selectedCustomerMode = [...customerModes].find((customerMode) => customerMode.checked)?.value;
 
-            if (field === customerSearch && selectedCustomerMode === 'existing' && !customerId?.value) {
+            if (field.matches('[data-phone-number]') && field.value.trim() && !applyPhoneValidity(field)) {
+                return;
+            } else if (field === customerSearch && selectedCustomerMode === 'existing' && !customerId?.value) {
                 field.setCustomValidity('Please choose a customer from the suggestions.');
-            } else if (field.validity.valueMissing) {
-                field.setCustomValidity(requiredFieldMessages[field.name] || 'Please complete this field.');
-            } else if (field.validity.typeMismatch && field.type === 'email') {
-                field.setCustomValidity('Please enter a valid email address.');
-            } else if (field.validity.typeMismatch && field.type === 'url') {
-                field.setCustomValidity('Please enter a valid web address.');
-            } else if (field.validity.tooShort) {
-                field.setCustomValidity(`Please use at least ${field.minLength} characters.`);
-            } else if (field.validity.tooLong) {
-                field.setCustomValidity(`Please use no more than ${field.maxLength} characters.`);
-            } else if (field.validity.patternMismatch) {
-                field.setCustomValidity('Please use the requested format.');
-            } else if (field.validity.rangeUnderflow) {
-                field.setCustomValidity(`Please enter a value of at least ${field.min}.`);
-            } else if (field.validity.rangeOverflow) {
-                field.setCustomValidity(`Please enter a value of no more than ${field.max}.`);
-            } else if (field.validity.stepMismatch && field.name === 'starts_at') {
-                field.setCustomValidity('Please choose a time from the list.');
-            } else if (field.validity.stepMismatch) {
-                field.setCustomValidity('Please choose a valid increment.');
-            } else if (field.validity.badInput) {
-                field.setCustomValidity('Please enter a valid value.');
+            } else if (existingCustomMessage) {
+                field.setCustomValidity(existingCustomMessage);
+            } else {
+                field.setCustomValidity(englishValidationMessage(field));
             }
 
             const dropdown = field.closest('[data-admin-dropdown]');
@@ -265,6 +354,11 @@
         });
 
         const clearValidationMessage = () => {
+            if (field.matches('[data-phone-number]')) {
+                applyPhoneValidity(field);
+                return;
+            }
+
             if (field.type === 'radio') {
                 document.querySelectorAll('input[type="radio"]').forEach((radio) => {
                     if (radio.name === field.name) radio.setCustomValidity('');

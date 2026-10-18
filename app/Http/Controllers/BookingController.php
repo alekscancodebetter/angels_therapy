@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBookingRequest;
 use App\Models\Appointment;
 use App\Models\Customer;
+use App\PhoneNumber;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\RedirectResponse;
@@ -39,7 +40,7 @@ class BookingController extends Controller
                         ['email' => $validated['email']],
                         [
                             'name' => $validated['name'],
-                            'phone' => $validated['phone'],
+                            'phone' => PhoneNumber::normalize($validated['phone_country'], $validated['phone']),
                         ],
                     );
 
@@ -66,9 +67,10 @@ class BookingController extends Controller
                 ->withErrors(['starts_at' => 'That appointment has just been taken. Please choose another time.']);
         }
 
-        return redirect(route('home').'#booking')->with(
-            'booking_status',
-            'Your '.$durationMinutes.'-minute treatment is booked for '.$startsAt->format('l, j F').' at '.$startsAt->format('g:i A').'.',
-        );
+        return redirect()->route('booking-confirmation')->with('booking_confirmation', [
+            'duration' => $durationMinutes,
+            'date' => $startsAt->format('l, j F'),
+            'time' => $startsAt->format('g:i A'),
+        ]);
     }
 }

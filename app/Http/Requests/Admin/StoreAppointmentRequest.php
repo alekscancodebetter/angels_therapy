@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\PhoneNumber;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -24,7 +25,8 @@ class StoreAppointmentRequest extends FormRequest
             'customer_id' => ['exclude_unless:customer_mode,existing', 'required', 'integer', 'exists:customers,id'],
             'customer_name' => ['exclude_unless:customer_mode,new', 'required', 'string', 'max:120'],
             'customer_email' => ['exclude_unless:customer_mode,new', 'nullable', 'email:rfc', 'max:190', 'unique:customers,email'],
-            'customer_phone' => ['exclude_unless:customer_mode,new', 'required', 'string', 'max:40'],
+            'customer_phone_country' => ['exclude_unless:customer_mode,new', 'required', 'string', Rule::in(array_keys(PhoneNumber::countries()))],
+            'customer_phone' => ['exclude_unless:customer_mode,new', 'required', 'string', 'max:40', PhoneNumber::validationRule($this->string('customer_phone_country')->toString())],
             'treatment_slug' => ['nullable', 'string', Rule::in(array_keys(config('treatments')))],
             'appointment_date' => ['nullable', 'date_format:Y-m-d'],
             'appointment_time' => ['nullable', 'date_format:H:i'],
@@ -78,6 +80,8 @@ class StoreAppointmentRequest extends FormRequest
             'customer_name.required' => 'Please enter the new customer’s name.',
             'customer_email.email' => 'Please enter a valid email address for the new customer.',
             'customer_email.unique' => 'A customer with this email address already exists. Choose that customer from the search instead.',
+            'customer_phone_country.required' => 'Please choose a country calling code for the new customer.',
+            'customer_phone_country.in' => 'Please choose a valid country calling code for the new customer.',
             'customer_phone.required' => 'Please enter the new customer’s telephone number.',
             'appointment_date.date_format' => 'Please enter a valid appointment date.',
             'appointment_time.date_format' => 'Please choose a valid appointment time.',
@@ -101,6 +105,7 @@ class StoreAppointmentRequest extends FormRequest
             'customer_mode' => $customerMode !== '' ? $customerMode : 'existing',
             'customer_name' => $this->string('customer_name')->trim()->toString(),
             'customer_email' => $customerEmail !== '' ? $customerEmail : null,
+            'customer_phone_country' => PhoneNumber::inputCountryCode($this->string('customer_phone_country')->toString(), $customerPhone),
             'customer_phone' => $customerPhone !== '' ? $customerPhone : null,
             'starts_at' => $appointmentDate !== '' && $appointmentTime !== ''
                 ? $appointmentDate.' '.$appointmentTime.':00'

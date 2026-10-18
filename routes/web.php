@@ -16,6 +16,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'home')->name('home');
+Route::view('/booking-confirmation', 'booking-confirmation')->name('booking-confirmation');
 Route::view('/privacy-policy', 'privacy-policy')->name('privacy-policy');
 Route::view('/terms-and-conditions', 'terms-and-conditions')->name('terms-and-conditions');
 Route::get('/sitemap.xml', function (): Response {

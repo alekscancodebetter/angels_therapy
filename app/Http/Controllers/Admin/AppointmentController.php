@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreAppointmentRequest;
 use App\Http\Requests\Admin\UpdateAppointmentRequest;
 use App\Models\Appointment;
 use App\Models\Customer;
+use App\PhoneNumber;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -93,7 +94,7 @@ class AppointmentController extends Controller
         return (int) Customer::create([
             'name' => $validated['customer_name'],
             'email' => $validated['customer_email'],
-            'phone' => $validated['customer_phone'] ?? null,
+            'phone' => PhoneNumber::normalize($validated['customer_phone_country'], $validated['customer_phone']),
         ])->getKey();
     }
 

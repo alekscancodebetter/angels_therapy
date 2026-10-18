@@ -81,10 +81,16 @@
                 Email address <small>Optional</small>
                 <input type="email" name="customer_email" value="{{ old('customer_email') }}" maxlength="190" autocomplete="email" @disabled($customerMode !== 'new')>
             </label>
-            <label>
-                Telephone number
-                <input type="tel" name="customer_phone" value="{{ old('customer_phone') }}" maxlength="40" autocomplete="tel" data-customer-required @required($customerMode === 'new') @disabled($customerMode !== 'new')>
-            </label>
+            <x-phone-input
+                name="customer_phone"
+                country-name="customer_phone_country"
+                id="customer_phone"
+                label="Telephone number"
+                variant="admin"
+                :required="$customerMode === 'new'"
+                :disabled="$customerMode !== 'new'"
+                :customer-required="true"
+            />
         </div>
     </div>
 

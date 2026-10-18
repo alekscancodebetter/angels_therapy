@@ -381,9 +381,9 @@
                                 </fieldset>
                             </div>
                             <p class="booking-package-note"><strong>Prepaid package:</strong> {{ config('booking.package.label') }} for £{{ config('booking.package.price') }}. Mention the package in your message or contact Villy to arrange it.</p>
-                            <div class="booking-form__row">
+                            <div class="booking-form__row booking-form__row--contact">
                                 <label for="name"><span>Name</span><input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required @error('name') aria-invalid="true" aria-describedby="name_error" @enderror>@error('name')<small id="name_error">{{ $message }}</small>@enderror</label>
-                                <label for="phone"><span>Telephone</span><input id="phone" name="phone" type="tel" inputmode="tel" value="{{ old('phone') }}" autocomplete="tel" required @error('phone') aria-invalid="true" aria-describedby="phone_error" @enderror>@error('phone')<small id="phone_error">{{ $message }}</small>@enderror</label>
+                                <x-phone-input />
                             </div>
                             <label for="email"><span>Email address</span><input id="email" name="email" type="email" inputmode="email" value="{{ old('email') }}" autocomplete="email" required @error('email') aria-invalid="true" aria-describedby="email_error" @enderror>@error('email')<small id="email_error">{{ $message }}</small>@enderror</label>
                             <label for="message"><span>Anything Villy should know? <em>Optional</em></span><textarea id="message" name="message" rows="4" maxlength="2000" aria-describedby="message_help @error('message') message_error @enderror" @error('message') aria-invalid="true" @enderror>{{ old('message') }}</textarea><small class="booking-field-help" id="message_help">Up to 2,000 characters. Please do not include detailed medical information.</small>@error('message')<small id="message_error">{{ $message }}</small>@enderror</label>

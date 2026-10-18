@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreCustomerRequest;
 use App\Http\Requests\Admin\UpdateCustomerRequest;
 use App\Models\Customer;
+use App\PhoneNumber;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -40,9 +41,12 @@ class CustomerController extends Controller
 
     public function store(StoreCustomerRequest $request): RedirectResponse
     {
+        $validated = $request->validated();
         $customer = Customer::create([
-            ...$request->validated(),
+            'name' => $validated['name'],
             'email' => $this->normalizedEmail($request),
+            'phone' => PhoneNumber::normalize($validated['phone_country'], $validated['phone']),
+            'notes' => $validated['notes'] ?? null,
         ]);
 
         return redirect()->route('admin.customers.show', $customer)->with('status', 'Customer added successfully.');
@@ -62,9 +66,12 @@ class CustomerController extends Controller
 
     public function update(UpdateCustomerRequest $request, Customer $customer): RedirectResponse
     {
+        $validated = $request->validated();
         $customer->update([
-            ...$request->validated(),
+            'name' => $validated['name'],
             'email' => $this->normalizedEmail($request),
+            'phone' => PhoneNumber::normalize($validated['phone_country'], $validated['phone']),
+            'notes' => $validated['notes'] ?? null,
         ]);
 
         return redirect()->route('admin.customers.show', $customer)->with('status', 'Customer details updated.');

@@ -38,7 +38,7 @@ class CustomerManagementTest extends TestCase
             'notes' => '',
         ]);
 
-        $customer = Customer::query()->where('phone', '07123 456789')->firstOrFail();
+        $customer = Customer::query()->where('phone', '+44 7123456789')->firstOrFail();
         $response->assertRedirect(route('admin.customers.show', $customer));
         $this->assertNull($customer->email);
     }
@@ -66,9 +66,28 @@ class CustomerManagementTest extends TestCase
             ->get(route('admin.customers.create'))
             ->assertOk()
             ->assertSee('Email address <small>Optional</small>', false)
+            ->assertSee('Country calling codes')
+            ->assertSee('name="phone_country"', false)
             ->assertSee('name="phone"', false)
-            ->assertSee('autocomplete="tel" required', false)
+            ->assertSee('autocomplete="tel-national"', false)
             ->assertDontSee('name="email" value="" maxlength="190" required', false);
+    }
+
+    public function test_customer_phone_must_match_selected_country(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->post(route('admin.customers.store'), [
+            'name' => 'Grace Taylor',
+            'email' => '',
+            'phone_country' => 'BG',
+            'phone' => '1234',
+            'notes' => '',
+        ])->assertSessionHasErrors([
+            'phone' => 'Please enter a valid telephone number with between 8 and 9 digits after +359.',
+        ]);
+
+        $this->assertDatabaseCount('customers', 0);
     }
 
     public function test_admin_can_search_and_update_customer_record(): void
@@ -95,7 +114,7 @@ class CustomerManagementTest extends TestCase
             'id' => $customer->id,
             'name' => 'Amelia Woods',
             'email' => null,
-            'phone' => '07000 000000',
+            'phone' => '+44 7000000000',
         ]);
     }
 

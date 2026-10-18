@@ -130,6 +130,7 @@
         const bookingDropdowns = [...bookingCalendar.querySelectorAll('[data-booking-dropdown]')];
         let selectedSlot = bookingCalendar.dataset.selectedSlot || '';
         let selectedDate = selectedSlot.slice(0, 10);
+        let conflictSlotValue = '';
         let displayedMonth = bookingCalendar.dataset.initialMonth;
         let displayedCalendar = null;
         let availabilityRequest = null;
@@ -191,16 +192,116 @@
             phone: 'Please enter your telephone number.',
             terms_accepted: 'Please accept the Terms & Conditions.',
         };
+        const englishValidationMessage = (field) => {
+            if (field.validity.valueMissing) {
+                return requiredFieldMessages[field.name] || 'Please complete this field.';
+            }
 
-        bookingCalendar.querySelectorAll('[required]').forEach((field) => {
+            if (field.validity.typeMismatch && field.type === 'email') {
+                return 'Please enter a valid email address.';
+            }
+
+            if (field.validity.typeMismatch && field.type === 'url') {
+                return 'Please enter a valid web address.';
+            }
+
+            if (field.validity.tooShort) {
+                return `Please use at least ${field.minLength} characters.`;
+            }
+
+            if (field.validity.tooLong) {
+                return `Please use no more than ${field.maxLength} characters.`;
+            }
+
+            if (field.validity.patternMismatch) {
+                return 'Please use the requested format.';
+            }
+
+            if (field.validity.rangeUnderflow) {
+                return `Please enter a value of at least ${field.min}.`;
+            }
+
+            if (field.validity.rangeOverflow) {
+                return `Please enter a value of no more than ${field.max}.`;
+            }
+
+            if (field.validity.stepMismatch) {
+                return 'Please choose a valid option.';
+            }
+
+            if (field.validity.badInput) {
+                return 'Please enter a valid value.';
+            }
+
+            return 'Please check this field.';
+        };
+
+        const phoneFields = [...bookingCalendar.querySelectorAll('[data-phone-field]')];
+        const selectedPhoneCountry = (phoneField) => phoneField.querySelector('[data-phone-country-option]:checked');
+        const phoneNationalDigits = (number, countryOption) => {
+            const trimmedNumber = number.trim();
+            let digits = trimmedNumber.replace(/\D/g, '');
+            const dialDigits = countryOption.dataset.phoneDialCode.replace(/\D/g, '');
+            const trunkPrefix = countryOption.dataset.phoneTrunkPrefix;
+
+            if (trimmedNumber.startsWith('+') && digits.startsWith(dialDigits)) {
+                digits = digits.slice(dialDigits.length);
+            } else if (digits.startsWith(`00${dialDigits}`)) {
+                digits = digits.slice(dialDigits.length + 2);
+            } else if (trunkPrefix && digits.startsWith(trunkPrefix)) {
+                digits = digits.slice(trunkPrefix.length);
+            }
+
+            return digits;
+        };
+        const applyPhoneValidity = (numberInput) => {
+            const phoneField = numberInput.closest('[data-phone-field]');
+            const countryOption = phoneField ? selectedPhoneCountry(phoneField) : null;
+            numberInput.setCustomValidity('');
+
+            if (!numberInput.value.trim() || !countryOption) return true;
+
+            const nationalDigits = phoneNationalDigits(numberInput.value, countryOption);
+            const minimumDigits = Number(countryOption.dataset.phoneMinDigits);
+            const maximumDigits = Number(countryOption.dataset.phoneMaxDigits);
+            const usesAllowedCharacters = /^[0-9+\s().-]+$/.test(numberInput.value.trim());
+            const isValid = usesAllowedCharacters
+                && nationalDigits.length >= minimumDigits
+                && nationalDigits.length <= maximumDigits;
+
+            if (!isValid) numberInput.setCustomValidity(countryOption.dataset.phoneMessage);
+
+            return isValid;
+        };
+        const syncPhoneField = (phoneField) => {
+            const countryOption = selectedPhoneCountry(phoneField);
+            const numberInput = phoneField.querySelector('[data-phone-number]');
+            const helpText = phoneField.querySelector('[data-phone-help]');
+            if (!countryOption || !numberInput) return;
+
+            numberInput.placeholder = countryOption.dataset.phonePlaceholder;
+            if (helpText) {
+                helpText.textContent = `${countryOption.dataset.phoneCountryLabel} ${countryOption.dataset.phoneDialCode}: ${countryOption.dataset.phoneMessage}`;
+            }
+            applyPhoneValidity(numberInput);
+        };
+
+        phoneFields.forEach((phoneField) => {
+            syncPhoneField(phoneField);
+            phoneField.querySelectorAll('[data-phone-country-option]').forEach((countryOption) => {
+                countryOption.addEventListener('change', () => syncPhoneField(phoneField));
+            });
+        });
+
+        bookingCalendar.querySelectorAll('input, textarea, select').forEach((field) => {
             field.addEventListener('invalid', () => {
                 field.setCustomValidity('');
 
-                if (field.validity.valueMissing) {
-                    field.setCustomValidity(requiredFieldMessages[field.name] || 'Please complete this field.');
-                } else if (field.validity.typeMismatch && field.type === 'email') {
-                    field.setCustomValidity('Please enter a valid email address.');
+                if (field.matches('[data-phone-number]') && field.value.trim() && !applyPhoneValidity(field)) {
+                    return;
                 }
+
+                field.setCustomValidity(englishValidationMessage(field));
 
                 const dropdown = field.closest('[data-booking-dropdown]');
                 if (dropdown) {
@@ -209,7 +310,10 @@
                 }
             });
 
-            const clearValidationMessage = () => field.setCustomValidity('');
+            const clearValidationMessage = () => {
+                field.setCustomValidity('');
+                if (field.matches('[data-phone-number]')) applyPhoneValidity(field);
+            };
             field.addEventListener('input', clearValidationMessage);
             field.addEventListener('change', clearValidationMessage);
         });
@@ -226,6 +330,7 @@
         };
 
         const resetSelectedSlot = (preserveDate = false) => {
+            conflictSlotValue = '';
             const dateToPreserve = preserveDate ? selectedDate : '';
             selectedSlot = '';
             selectedDate = dateToPreserve;
@@ -235,6 +340,8 @@
         };
 
         const setSelectedSlot = (day, slot) => {
+            conflictSlotValue = '';
+            timeSlots.querySelector('.booking-alternatives')?.remove();
             selectedSlot = slot.value;
             selectedDate = day.date;
             selectedInput.value = slot.value;
@@ -267,6 +374,14 @@
                 return;
             }
 
+            let alternativeGroup = null;
+            let alternativeReasons = null;
+            let alternativeOptions = null;
+
+            if (!day.slots.some((slot) => slot.value === conflictSlotValue && !slot.available && slot.suggested_duration_minutes)) {
+                conflictSlotValue = '';
+            }
+
             day.slots.forEach((slot) => {
                 const suggestedDuration = Number(slot.suggested_duration_minutes) || null;
                 const offersShorterDuration = !slot.available && suggestedDuration !== null;
@@ -280,8 +395,28 @@
                     button.setAttribute('aria-label', slot.label);
                     button.setAttribute('aria-pressed', String(slot.value === selectedSlot));
                     button.textContent = slot.label;
-                    button.addEventListener('click', () => setSelectedSlot(day, slot));
+                    button.addEventListener('click', () => {
+                        setSelectedSlot(day, slot);
+                        renderTimeSlots(day);
+                        timeSlots.querySelector(`button[data-slot="${slot.value}"]`)?.focus({ preventScroll: true });
+                    });
                     slotElement = button;
+                } else if (offersShorterDuration) {
+                    const conflictButton = document.createElement('button');
+                    conflictButton.type = 'button';
+                    conflictButton.className = 'booking-time booking-time--conflict';
+                    conflictButton.dataset.slot = slot.value;
+                    conflictButton.textContent = slot.label;
+                    conflictButton.setAttribute('aria-label', `${slot.label}: only ${suggestedDuration} minutes available. Show options.`);
+                    conflictButton.setAttribute('aria-expanded', String(slot.value === conflictSlotValue));
+                    if (slot.value === conflictSlotValue) conflictButton.setAttribute('aria-controls', 'booking-conflict-options');
+                    conflictButton.addEventListener('click', () => {
+                        resetSelectedSlot(true);
+                        conflictSlotValue = slot.value;
+                        renderTimeSlots(day);
+                        timeSlots.querySelector('.booking-alternatives')?.focus({ preventScroll: true });
+                    });
+                    slotElement = conflictButton;
                 } else {
                     const unavailableSlot = document.createElement('span');
                     unavailableSlot.className = 'booking-time booking-time--unavailable';
@@ -298,23 +433,47 @@
 
                 timeSlots.append(slotElement);
 
-                if (offersShorterDuration) {
+                if (offersShorterDuration && slot.value === conflictSlotValue) {
+                    if (!alternativeGroup) {
+                        alternativeGroup = document.createElement('div');
+                        alternativeGroup.className = 'booking-alternatives';
+                        alternativeGroup.id = 'booking-conflict-options';
+                        alternativeGroup.tabIndex = -1;
+                        alternativeGroup.setAttribute('role', 'group');
+                        alternativeGroup.setAttribute('aria-label', `Appointment options for ${slot.label}`);
+
+                        alternativeReasons = document.createElement('div');
+                        alternativeReasons.className = 'booking-alternatives__reasons';
+
+                        const optionsLabel = document.createElement('small');
+                        optionsLabel.className = 'booking-alternatives__options-label';
+                        optionsLabel.textContent = 'Choose an option';
+
+                        alternativeOptions = document.createElement('div');
+                        alternativeOptions.className = 'booking-alternatives__options';
+                        alternativeGroup.append(alternativeReasons, optionsLabel, alternativeOptions);
+                    }
+
+                    const reasonText = slot.unavailable_reason || 'This time is not available for the selected duration.';
                     const alternativeButton = document.createElement('button');
                     alternativeButton.type = 'button';
                     alternativeButton.className = 'booking-time booking-time--alternative';
                     alternativeButton.dataset.slot = slot.value;
-                    alternativeButton.setAttribute('aria-label', `Choose ${suggestedDuration} minutes at ${slot.label}. ${slot.unavailable_reason}`);
+                    alternativeButton.setAttribute('aria-label', `Choose ${suggestedDuration} minutes at ${slot.label}. ${reasonText}`);
                     alternativeButton.setAttribute('aria-pressed', 'false');
 
                     const alternativeLabel = document.createElement('span');
                     alternativeLabel.className = 'booking-time__label';
                     alternativeLabel.textContent = `Choose ${suggestedDuration} minutes at ${slot.label}`;
 
-                    const reason = document.createElement('small');
-                    reason.className = 'booking-time__reason';
-                    reason.textContent = slot.unavailable_reason;
+                    if (![...alternativeReasons.children].some((reason) => reason.textContent === reasonText)) {
+                        const reason = document.createElement('p');
+                        reason.className = 'booking-alternatives__reason';
+                        reason.textContent = `${slot.label}: ${reasonText}`;
+                        alternativeReasons.append(reason);
+                    }
 
-                    alternativeButton.append(alternativeLabel, reason);
+                    alternativeButton.append(alternativeLabel);
                     alternativeButton.addEventListener('click', async () => {
                         const targetDate = day.date;
                         const targetSlot = slot.value;
@@ -336,13 +495,46 @@
                             loadingMessage.textContent = 'That time is no longer available. Please choose another appointment.';
                         }
                     });
-                    timeSlots.append(alternativeButton);
+                    alternativeOptions.append(alternativeButton);
                 }
             });
+
+            if (alternativeGroup) {
+                const fullDurationLabel = document.createElement('small');
+                fullDurationLabel.className = 'booking-alternatives__options-label';
+                fullDurationLabel.textContent = `Or keep ${durationValue()} minutes at another time`;
+                const fullDurationOptions = document.createElement('div');
+                fullDurationOptions.className = 'booking-alternatives__full-duration';
+
+                day.slots.filter((slot) => slot.available).forEach((slot) => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'booking-time';
+                    button.dataset.slot = slot.value;
+                    button.textContent = slot.label;
+                    button.setAttribute('aria-label', `Choose ${durationValue()} minutes at ${slot.label}`);
+                    button.setAttribute('aria-pressed', 'false');
+                    button.addEventListener('click', () => {
+                        setSelectedSlot(day, slot);
+                        renderTimeSlots(day);
+                        timeSlots.querySelector(`button[data-slot="${slot.value}"]`)?.focus({ preventScroll: true });
+                    });
+                    fullDurationOptions.append(button);
+                });
+
+                if (!fullDurationOptions.children.length) {
+                    const emptyMessage = document.createElement('p');
+                    emptyMessage.textContent = `No ${durationValue()}-minute appointments remain on this day. Please choose another date.`;
+                    fullDurationOptions.append(emptyMessage);
+                }
+                alternativeGroup.append(fullDurationLabel, fullDurationOptions);
+                timeSlots.append(alternativeGroup);
+            }
         };
 
         const selectDay = (day) => {
             if (selectedDate !== day.date) {
+                conflictSlotValue = '';
                 selectedSlot = '';
                 selectedInput.value = '';
                 selectedAppointment.textContent = 'Choose a time';

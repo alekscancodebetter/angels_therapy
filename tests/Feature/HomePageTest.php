@@ -78,6 +78,26 @@ class HomePageTest extends TestCase
             ->assertSee('Federation of Holistic Therapists logo');
     }
 
+    public function test_booking_confirmation_page_shows_the_appointment_details_in_english(): void
+    {
+        $this->withSession([
+            'booking_confirmation' => [
+                'duration' => 90,
+                'date' => 'Friday, 16 October',
+                'time' => '10:00 AM',
+            ],
+        ])->get(route('booking-confirmation'))
+            ->assertOk()
+            ->assertSee('Thank you for booking with us.')
+            ->assertSee('Your appointment has been reserved.')
+            ->assertSee('Treatment length')
+            ->assertSee('90 minutes')
+            ->assertSee('Friday, 16 October')
+            ->assertSee('10:00 AM')
+            ->assertSee('<meta name="robots" content="noindex, nofollow">', false)
+            ->assertSee('<html lang="en">', false);
+    }
+
     public function test_an_appointment_request_can_be_stored(): void
     {
         $this->post('/appointment-request', [

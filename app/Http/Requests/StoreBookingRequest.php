@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\Appointment;
+use App\PhoneNumber;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,7 +27,8 @@ class StoreBookingRequest extends FormRequest
             'duration_minutes' => ['required', 'integer', Rule::in(array_keys(config('booking.duration_options')))],
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email:rfc', 'max:190'],
-            'phone' => ['required', 'string', 'max:40'],
+            'phone_country' => ['required', 'string', Rule::in(array_keys(PhoneNumber::countries()))],
+            'phone' => ['required', 'string', 'max:40', PhoneNumber::validationRule($this->string('phone_country')->toString())],
             'message' => ['nullable', 'string', 'max:2000'],
             'terms_accepted' => ['accepted'],
         ];
@@ -42,6 +44,8 @@ class StoreBookingRequest extends FormRequest
             'name.required' => 'Please enter your name.',
             'email.required' => 'Please enter your email address.',
             'email.email' => 'Please enter a valid email address.',
+            'phone_country.required' => 'Please choose a country calling code.',
+            'phone_country.in' => 'Please choose a valid country calling code.',
             'phone.required' => 'Please enter your telephone number.',
             'terms_accepted.accepted' => 'Please accept the terms and conditions before booking.',
         ];
@@ -71,10 +75,13 @@ class StoreBookingRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        $phone = $this->string('phone')->trim()->toString();
+
         $this->merge([
             'name' => $this->string('name')->trim()->toString(),
             'email' => Str::lower($this->string('email')->trim()->toString()),
-            'phone' => $this->string('phone')->trim()->toString(),
+            'phone_country' => PhoneNumber::inputCountryCode($this->string('phone_country')->toString(), $phone),
+            'phone' => $phone,
         ]);
     }
 

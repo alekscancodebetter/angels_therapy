@@ -29,6 +29,8 @@ class AppointmentManagementTest extends TestCase
             ->assertSee('Alice Example · alice@example.com · 07123 456789')
             ->assertSee('Existing customer')
             ->assertSee('New customer')
+            ->assertSee('name="customer_phone_country"', false)
+            ->assertSee('Country calling codes')
             ->assertSee('Sports Massage')
             ->assertSee('Deep Tissue Massage')
             ->assertSee('admin-dropdown', false)
@@ -144,11 +146,11 @@ class AppointmentManagementTest extends TestCase
             'notes' => 'First appointment.',
         ])->assertRedirect(route('admin.calendar', ['month' => '2026-11']));
 
-        $customer = Customer::query()->where('phone', '07123 456789')->firstOrFail();
+        $customer = Customer::query()->where('phone', '+44 7123456789')->firstOrFail();
 
         $this->assertSame('New Customer', $customer->name);
         $this->assertNull($customer->email);
-        $this->assertSame('07123 456789', $customer->phone);
+        $this->assertSame('+44 7123456789', $customer->phone);
         $this->assertDatabaseHas('appointments', [
             'customer_id' => $customer->id,
             'starts_at' => '2026-11-21 14:30:00',
@@ -171,6 +173,28 @@ class AppointmentManagementTest extends TestCase
             'status' => Appointment::STATUS_SCHEDULED,
         ])->assertSessionHasErrors([
             'customer_phone' => 'Please enter the new customer’s telephone number.',
+        ]);
+
+        $this->assertDatabaseCount('customers', 0);
+        $this->assertDatabaseCount('appointments', 0);
+    }
+
+    public function test_new_customer_phone_must_match_selected_country_when_scheduling_appointment(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->post(route('admin.appointments.store'), [
+            'customer_mode' => 'new',
+            'customer_name' => 'New Customer',
+            'customer_email' => '',
+            'customer_phone_country' => 'GB',
+            'customer_phone' => '07123',
+            'appointment_date' => '2026-11-21',
+            'appointment_time' => '14:30',
+            'duration_minutes' => 60,
+            'status' => Appointment::STATUS_SCHEDULED,
+        ])->assertSessionHasErrors([
+            'customer_phone' => 'Please enter a valid telephone number with 10 digits after +44.',
         ]);
 
         $this->assertDatabaseCount('customers', 0);

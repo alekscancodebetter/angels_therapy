@@ -145,7 +145,10 @@ class BookingCalendarTest extends TestCase
             'phone' => '07911 654 321',
             'terms_accepted' => '1',
         ])->assertSessionHasNoErrors()
-            ->assertSessionHas('booking_status');
+            ->assertRedirect(route('booking-confirmation'))
+            ->assertSessionHas('booking_confirmation.duration', 90)
+            ->assertSessionHas('booking_confirmation.date', 'Monday, 19 October')
+            ->assertSessionHas('booking_confirmation.time', '9:00 AM');
 
         $this->assertDatabaseCount('appointments', 2);
         $this->assertDatabaseHas('customers', ['email' => 'mia@example.com']);
@@ -164,15 +167,17 @@ class BookingCalendarTest extends TestCase
             'phone' => '07911 123 456',
             'message' => 'Please focus on my shoulders.',
             'terms_accepted' => '1',
-        ])->assertRedirect(route('home').'#booking')
+        ])->assertRedirect(route('booking-confirmation'))
             ->assertSessionHasNoErrors()
-            ->assertSessionHas('booking_status');
+            ->assertSessionHas('booking_confirmation.duration', 90)
+            ->assertSessionHas('booking_confirmation.date', 'Friday, 16 October')
+            ->assertSessionHas('booking_confirmation.time', '10:00 AM');
 
         $customer = Customer::query()->where('email', 'jane@example.com')->firstOrFail();
         $appointment = Appointment::query()->whereBelongsTo($customer)->firstOrFail();
 
         $this->assertSame('Jane Visitor', $customer->name);
-        $this->assertSame('07911 123 456', $customer->phone);
+        $this->assertSame('+44 7911123456', $customer->phone);
         $this->assertSame('sports-massage', $appointment->treatment_slug);
         $this->assertSame('2026-10-16 10:00', $appointment->starts_at->format('Y-m-d H:i'));
         $this->assertSame(90, $appointment->duration_minutes);
@@ -286,6 +291,48 @@ class BookingCalendarTest extends TestCase
         $this->assertDatabaseCount('customers', 0);
     }
 
+    public function test_booking_rejects_phone_number_with_wrong_length_for_selected_country(): void
+    {
+        $this->travelTo(CarbonImmutable::parse('2026-10-14 09:00:00', 'Europe/London'));
+
+        $this->post(route('bookings.store'), [
+            'starts_at' => '2026-10-16T10:00',
+            'treatment_slug' => 'sports-massage',
+            'duration_minutes' => 60,
+            'name' => 'Mia Harris',
+            'email' => 'mia@example.com',
+            'phone_country' => 'GB',
+            'phone' => '07123',
+            'terms_accepted' => '1',
+        ])->assertSessionHasErrors([
+            'phone' => 'Please enter a valid telephone number with 10 digits after +44.',
+        ]);
+
+        $this->assertDatabaseCount('customers', 0);
+        $this->assertDatabaseCount('appointments', 0);
+    }
+
+    public function test_booking_rejects_unknown_country_calling_code(): void
+    {
+        $this->travelTo(CarbonImmutable::parse('2026-10-14 09:00:00', 'Europe/London'));
+
+        $this->post(route('bookings.store'), [
+            'starts_at' => '2026-10-16T10:00',
+            'treatment_slug' => 'sports-massage',
+            'duration_minutes' => 60,
+            'name' => 'Mia Harris',
+            'email' => 'mia@example.com',
+            'phone_country' => 'XX',
+            'phone' => '07911 654321',
+            'terms_accepted' => '1',
+        ])->assertSessionHasErrors([
+            'phone_country' => 'Please choose a valid country calling code.',
+        ]);
+
+        $this->assertDatabaseCount('customers', 0);
+        $this->assertDatabaseCount('appointments', 0);
+    }
+
     public function test_home_page_shows_contact_details_before_calendar_and_practice_details_after_it(): void
     {
         $this->get(route('home'))
@@ -301,6 +348,9 @@ class BookingCalendarTest extends TestCase
             ->assertSee('data-booking-duration', false)
             ->assertSee('Treatment options')
             ->assertSee('Duration and price options')
+            ->assertSee('Country calling codes')
+            ->assertSee('name="phone_country"', false)
+            ->assertSee('🇬🇧')
             ->assertSee('60 minutes — £75')
             ->assertSee('90 minutes — £110')
             ->assertSee('3 × 60-minute sessions')
