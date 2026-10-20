@@ -33,8 +33,11 @@
 
     <header class="site-header site-header--solid" data-header>
         <a class="brand" href="{{ route('home') }}" aria-label="Angel Touch Therapy home">
-            <img class="brand__mark" src="{{ asset('images/angel-touch-mark.webp') }}" alt="Angel Touch Therapy logo" width="600" height="310">
-            <span><strong>Angel Touch</strong><small>Therapy · Harrogate</small></span>
+            <img class="brand__mark" src="{{ asset('images/angel-touch-customer-mark.webp') }}" alt="Angel Touch Therapy wing and golden hand logo" width="720" height="720" fetchpriority="high">
+            <span class="brand__copy" aria-label="Angel Touch Therapy Harrogate">
+                <strong>Angel <b>Touch</b></strong>
+                <small><span>Therapy</span><i aria-hidden="true"></i><span>Harrogate</span></small>
+            </span>
         </a>
 
         <nav class="main-nav" id="main-nav" aria-label="Main navigation">
@@ -162,7 +165,7 @@
                         <p class="privacy-section-number">05</p>
                         <h2>Cookies, browser storage and external content</h2>
                         <p>The website uses strictly necessary session and security cookies so that forms and the administration area work securely. Your cookie preference is saved in your browser’s local storage under <code>angel-touch-cookie-consent-v3</code>. You can remove it through your browser settings or reopen the notice using the “Cookie settings” button in the footer.</p>
-                        <p>We do not use analytics cookies. If you choose “Accept all”, the website may load the Google Ads tag and Meta Pixel to measure advertising visits, completed bookings and phone-link clicks. Google and Meta may use advertising cookies, ad-click information and related technical data for conversion measurement and, where permitted by your settings, personalised advertising. If you choose “Use essential only”, these advertising tags are not loaded. Video preview images are supplied by YouTube. A privacy-enhanced YouTube player is loaded only after you choose to play a video; YouTube may then receive technical information and set or access its own storage. Links to Google Maps, Google Reviews, Instagram and YouTube take you to services with their own privacy policies.</p>
+                        <p>We do not use analytics cookies. If you choose “Accept all”, the website may load the Google Ads tag and Meta Pixel to measure advertising visits, completed bookings and phone-link clicks. Google and Meta may use advertising cookies, ad-click information and related technical data for conversion measurement and, where permitted by your settings, personalised advertising. If you choose “Use essential only”, these advertising tags are not loaded. Video preview images are supplied by YouTube. A privacy-enhanced YouTube player is loaded only after you choose to play a video; YouTube may then receive technical information and set or access its own storage. Links to Google Maps, Google Reviews, Instagram, YouTube and Facebook take you to services with their own privacy policies.</p>
                     </section>
 
                     <section id="retention">
@@ -218,6 +221,8 @@
             <div class="social-links">
                 <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
                 <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="https://www.facebook.com/angeltouchtreatment/" target="_blank" rel="noopener noreferrer">Facebook <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="https://www.tiktok.com/@angel.touch.harrogate" target="_blank" rel="noopener noreferrer">TikTok <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
             </div>
         </div>
         <div class="container site-footer__bottom">

@@ -29,7 +29,7 @@
                     <span class="google-reviews__stars" aria-label="{{ $googleReviews['rating'] }} out of 5 stars">★★★★★</span>
                     <small>View all {{ $googleReviews['review_count'] }} Google reviews ↗</small>
                 </a>
-                <a class="button button--dark" href="{{ $googleReviews['write_review_url'] }}" target="_blank" rel="noopener noreferrer">Leave a review <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a class="button button--gold google-reviews__write-button" href="{{ $googleReviews['write_review_url'] }}" target="_blank" rel="noopener noreferrer">Leave a review <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
             </div>
         </div>
 

@@ -339,7 +339,7 @@ class BookingCalendarTest extends TestCase
             ->assertOk()
             ->assertSeeInOrder([
                 'Who is the treatment for?',
-                'Available appointments',
+                'Choose your preferred appointment time',
                 'Everything you need for your visit.',
             ])
             ->assertSee('data-availability-url="'.route('appointments.availability').'"', false)
@@ -354,7 +354,9 @@ class BookingCalendarTest extends TestCase
             ->assertSee('60 minutes — £75')
             ->assertSee('90 minutes — £110')
             ->assertSee('3 × 60-minute sessions')
-            ->assertSee('£210');
+            ->assertSee('£210')
+            ->assertSee('If your preferred time is already booked')
+            ->assertSee('07915 910 033');
     }
 
     public function test_availability_rejects_months_outside_the_booking_window(): void

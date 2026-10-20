@@ -16,11 +16,17 @@
     <meta property="og:title" content="Angel Touch Therapy | Massage Therapy in Harrogate">
     <meta property="og:description" content="Professional massage therapy in Harrogate with Villy, a qualified and fully insured therapist.">
     <meta property="og:url" content="{{ $canonicalUrl }}">
-    <meta property="og:image" content="{{ asset('images/angel-touch-hero.png') }}">
+    <meta property="og:image" content="{{ asset('images/angel-touch-share-logo.png') }}">
+    <meta property="og:image:secure_url" content="{{ asset('images/angel-touch-share-logo.png') }}">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:width" content="1254">
+    <meta property="og:image:height" content="1254">
+    <meta property="og:image:alt" content="Angel Touch Therapy logo">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Angel Touch Therapy | Massage Therapy in Harrogate">
     <meta name="twitter:description" content="Professional massage therapy in Harrogate with Villy, a qualified and fully insured therapist.">
-    <meta name="twitter:image" content="{{ asset('images/angel-touch-hero.png') }}">
+    <meta name="twitter:image" content="{{ asset('images/angel-touch-share-logo.png') }}">
+    <meta name="twitter:image:alt" content="Angel Touch Therapy logo">
     <title>Angel Touch Therapy | Massage Therapy in Harrogate</title>
     <link rel="canonical" href="{{ $canonicalUrl }}">
     @include('favicons')
@@ -42,8 +48,11 @@
 
     <header class="site-header" data-header>
         <a class="brand" href="#top" aria-label="Angel Touch Therapy home">
-            <img class="brand__mark" src="{{ asset('images/angel-touch-mark.webp') }}" alt="Angel Touch Therapy logo" width="600" height="310">
-            <span><strong>Angel Touch</strong><small>Therapy · Harrogate</small></span>
+            <img class="brand__mark" src="{{ asset('images/angel-touch-customer-mark.webp') }}" alt="Angel Touch Therapy wing and golden hand logo" width="720" height="720" fetchpriority="high">
+            <span class="brand__copy" aria-label="Angel Touch Therapy Harrogate">
+                <strong>Angel <b>Touch</b></strong>
+                <small><span>Therapy</span><i aria-hidden="true"></i><span>Harrogate</span></small>
+            </span>
         </a>
 
         <nav class="main-nav" id="main-nav" aria-label="Main navigation">
@@ -394,7 +403,7 @@
                     </section>
 
                     <section class="booking-calendar" aria-labelledby="booking-calendar-title" @error('starts_at') aria-describedby="starts_at_error" @enderror>
-                        <div class="booking-calendar__step"><span>02</span><div><small>Choose a time</small><h3 id="booking-calendar-title">Available appointments</h3></div></div>
+                        <div class="booking-calendar__step"><span>02</span><div><small>Preferred time</small><h3 id="booking-calendar-title">Choose your preferred appointment time</h3></div></div>
                         <div class="booking-calendar__toolbar">
                             <button type="button" data-booking-previous aria-label="Previous month">←</button>
                             <strong data-booking-month aria-live="polite">Loading calendar…</strong>
@@ -403,9 +412,16 @@
                         <div class="booking-calendar__weekdays" aria-hidden="true"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
                         <div class="booking-calendar__grid" data-booking-days aria-label="Available appointment dates"></div>
                         <div class="booking-calendar__loading" data-booking-loading role="status" aria-live="polite" aria-atomic="true">Checking available appointments…</div>
+                        <div class="booking-times__notice" role="note">
+                            <span class="booking-times__notice-icon" aria-hidden="true">i</span>
+                            <div class="booking-times__notice-content">
+                                <p>If your preferred time is already booked, call us and we’ll get back to you to arrange the best available time for you.</p>
+                                <a class="booking-times__call phone-link" href="tel:+447915910033" aria-label="Call Angel Touch Therapy"><span>Call now</span></a>
+                            </div>
+                        </div>
                         <div class="booking-times">
-                            <div><small>Available times</small><strong data-booking-day>Choose a date above</strong></div>
-                            <div class="booking-times__slots" data-booking-times><p>Select a highlighted day to see its available times.</p></div>
+                            <div><small>Preferred time</small><strong data-booking-day>Choose a date above</strong></div>
+                            <div class="booking-times__slots" data-booking-times><p>Select a highlighted day to see the times you can request.</p></div>
                         </div>
                         <div class="selected-appointment" aria-live="polite" aria-atomic="true"><small>Selected appointment</small><strong data-selected-appointment>Choose a date and time</strong></div>
                         @error('starts_at')<small class="booking-field-error" id="starts_at_error">{{ $message }}</small>@enderror
@@ -437,6 +453,18 @@
                             <div><dt>Friday</dt><dd>8am – 7pm</dd></div>
                         </dl>
                     </div>
+                    <figure class="practice-map">
+                        <a class="practice-map__image" href="https://www.google.com/maps/search/?api=1&query=NuDerma+Clinic+137+Wetherby+Road+Harrogate+HG2+7AA" target="_blank" rel="noopener noreferrer" aria-label="View the practice map in Google Maps (opens in a new tab)">
+                            <img src="{{ asset('images/practice-google-map.png') }}" alt="Google Maps view showing NuDerma Clinic on Wetherby Road near Hookstone Drive in Harrogate" width="1280" height="720" loading="lazy" decoding="async">
+                        </a>
+                        <figcaption class="practice-map__details">
+                            <p class="eyebrow">Plan your visit</p>
+                            <h3>Find us at NuDerma Clinic.</h3>
+                            <p>137 Wetherby Road<br>Harrogate, North Yorkshire, HG2 7AA</p>
+                            <p>Open the interactive map for directions from your location.</p>
+                            <a class="button button--gold" href="https://www.google.com/maps/search/?api=1&query=NuDerma+Clinic+137+Wetherby+Road+Harrogate+HG2+7AA" target="_blank" rel="noopener noreferrer">Open in Google Maps <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                        </figcaption>
+                    </figure>
                 </div>
             </div>
         </section>
@@ -452,6 +480,8 @@
             <div class="social-links">
                 <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
                 <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="https://www.facebook.com/angeltouchtreatment/" target="_blank" rel="noopener noreferrer">Facebook <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="https://www.tiktok.com/@angel.touch.harrogate" target="_blank" rel="noopener noreferrer">TikTok <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
             </div>
         </div>
         <div class="container site-footer__bottom">

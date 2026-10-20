@@ -33,8 +33,11 @@
 
     <header class="site-header site-header--solid" data-header>
         <a class="brand" href="{{ route('home') }}" aria-label="Angel Touch Therapy home">
-            <img class="brand__mark" src="{{ asset('images/angel-touch-mark.webp') }}" alt="Angel Touch Therapy logo" width="600" height="310">
-            <span><strong>Angel Touch</strong><small>Therapy · Harrogate</small></span>
+            <img class="brand__mark" src="{{ asset('images/angel-touch-customer-mark.webp') }}" alt="Angel Touch Therapy wing and golden hand logo" width="720" height="720" fetchpriority="high">
+            <span class="brand__copy" aria-label="Angel Touch Therapy Harrogate">
+                <strong>Angel <b>Touch</b></strong>
+                <small><span>Therapy</span><i aria-hidden="true"></i><span>Harrogate</span></small>
+            </span>
         </a>
 
         <nav class="main-nav" id="main-nav" aria-label="Main navigation">
@@ -173,7 +176,7 @@
                         <p class="privacy-section-number">09</p>
                         <h2>Website use and privacy</h2>
                         <p>The website is provided for general information and appointment booking. We take reasonable care to keep it available and accurate but cannot promise uninterrupted access. Content, branding and images owned by Angel Touch Therapy may not be copied or used commercially without permission.</p>
-                        <p>External websites, including Google, YouTube and Instagram, have their own terms and privacy practices. How we handle personal information is explained in our <a href="{{ route('privacy-policy') }}">Privacy Policy</a>.</p>
+                        <p>External websites, including Google, YouTube, Instagram and Facebook, have their own terms and privacy practices. How we handle personal information is explained in our <a href="{{ route('privacy-policy') }}">Privacy Policy</a>.</p>
                     </section>
 
                     <section id="contact-and-law">
@@ -198,6 +201,8 @@
             <div class="social-links">
                 <a href="https://www.instagram.com/angeltouch_massages_hg/" target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
                 <a href="https://www.youtube.com/channel/UCE2vtnQQMdXAqbUktxCp5wQ/videos" target="_blank" rel="noopener noreferrer">YouTube <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="https://www.facebook.com/angeltouchtreatment/" target="_blank" rel="noopener noreferrer">Facebook <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
+                <a href="https://www.tiktok.com/@angel.touch.harrogate" target="_blank" rel="noopener noreferrer">TikTok <span aria-hidden="true">↗</span><span class="visually-hidden"> (opens in a new tab)</span></a>
             </div>
         </div>
         <div class="container site-footer__bottom">
