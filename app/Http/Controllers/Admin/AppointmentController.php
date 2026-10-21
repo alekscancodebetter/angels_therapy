@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreAppointmentRequest;
 use App\Http\Requests\Admin\UpdateAppointmentRequest;
+use App\Mail\BookingConfirmedCustomer;
 use App\Models\Appointment;
 use App\Models\Customer;
 use App\PhoneNumber;
@@ -12,7 +13,9 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
+use Throwable;
 
 class AppointmentController extends Controller
 {
@@ -34,7 +37,7 @@ class AppointmentController extends Controller
         $validated = $request->validated();
         $startsAt = CarbonImmutable::parse($validated['starts_at'], config('app.timezone'));
 
-        if ($validated['status'] === Appointment::STATUS_SCHEDULED
+        if (Appointment::blocksAvailability($validated['status'])
             && Appointment::hasConflict($startsAt, (int) $validated['duration_minutes'])) {
             return back()->withInput()->withErrors([
                 'starts_at' => 'This appointment overlaps another scheduled appointment.',
@@ -65,13 +68,14 @@ class AppointmentController extends Controller
         $validated = $request->validated();
         $startsAt = CarbonImmutable::parse($validated['starts_at'], config('app.timezone'));
 
-        if ($validated['status'] === Appointment::STATUS_SCHEDULED
+        if (Appointment::blocksAvailability($validated['status'])
             && Appointment::hasConflict($startsAt, (int) $validated['duration_minutes'], $appointment->id)) {
             return back()->withInput()->withErrors([
                 'starts_at' => 'This appointment overlaps another scheduled appointment.',
             ]);
         }
 
+        $previousStatus = $appointment->status;
         $appointment = DB::transaction(function () use ($appointment, $validated): Appointment {
             $customerId = $this->resolveCustomerId($validated);
             $appointment->update($this->appointmentAttributes($validated, $customerId));
@@ -79,9 +83,29 @@ class AppointmentController extends Controller
             return $appointment;
         });
 
+        if ($previousStatus === Appointment::STATUS_PENDING_CONFIRMATION
+            && $appointment->status === Appointment::STATUS_SCHEDULED) {
+            $this->queueBookingConfirmation($appointment->load('customer'));
+        }
+
         return redirect()->route('admin.calendar', [
             'month' => $appointment->starts_at->format('Y-m'),
         ])->with('status', 'Appointment updated.');
+    }
+
+    private function queueBookingConfirmation(Appointment $appointment): void
+    {
+        if ($appointment->customer->email === null) {
+            return;
+        }
+
+        try {
+            Mail::to($appointment->customer->email)->queue(
+                (new BookingConfirmedCustomer($appointment))->afterCommit(),
+            );
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 
     /** @param array<string, mixed> $validated */

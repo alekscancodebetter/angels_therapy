@@ -2,23 +2,29 @@
 set -Eeuo pipefail
 umask 022
 
-REPOSITORY=/home/nikkiebl/repositories/angels_therapy
-PRIVATE_ROOT=/home/nikkiebl/angels-therapy-experiment
-WEB_ROOT=/home/nikkiebl/experiment.angeltouchtherapy.co.uk
+REPOSITORY=/home/nikkiebl/repositories/angels_therapy_production
+PRIVATE_ROOT=/home/nikkiebl/angels-therapy-production
+WEB_ROOT=/home/nikkiebl/angeltouchtherapy.co.uk
 SHARED="$PRIVATE_ROOT/shared"
-DEPLOY_CONFIG=/home/nikkiebl/.angels-therapy-deploy.conf
+BACKUP_ROOT="$PRIVATE_ROOT/backups"
+INITIALIZED_MARKER="$PRIVATE_ROOT/production-initialized"
+DEPLOY_CONFIG=/home/nikkiebl/.angels-therapy-production-deploy.conf
 
 fail() { echo "Deploy failed: $*" >&2; exit 1; }
 [[ "$(id -un)" == nikkiebl ]] || fail 'Run as cPanel user nikkiebl.'
+[[ "$PRIVATE_ROOT" == /home/nikkiebl/angels-therapy-production ]] || fail 'Unexpected private root.'
+[[ "$WEB_ROOT" == /home/nikkiebl/angeltouchtherapy.co.uk ]] || fail 'Unexpected production web root.'
+[[ "$BACKUP_ROOT" == "$PRIVATE_ROOT/backups" ]] || fail 'Unexpected backup root.'
 [[ -d "$REPOSITORY/.git" ]] || fail 'Repository path does not exist.'
 [[ ! -L "$PRIVATE_ROOT" && ! -L "$WEB_ROOT" ]] || fail 'Private/web root must be real directories, not symlinks.'
 cd -- "$REPOSITORY"
-[[ "$(git branch --show-current)" == main ]] || fail 'Check out main first.'
+[[ "$(git branch --show-current)" == production ]] || fail 'Check out production first.'
 [[ -z "$(git status --porcelain)" ]] || fail 'The hosting repository must have a clean working tree.'
 for tool in flock rsync tar; do command -v "$tool" >/dev/null || fail "Missing tool: $tool"; done
 
-mkdir -p "$PRIVATE_ROOT/releases" "$SHARED" "$WEB_ROOT"
-chmod 700 "$PRIVATE_ROOT" "$SHARED"
+mkdir -p "$PRIVATE_ROOT/releases" "$SHARED" "$BACKUP_ROOT"
+[[ ! -L "$SHARED" && ! -L "$BACKUP_ROOT" ]] || fail 'Shared/backup paths must be real directories, not symlinks.'
+chmod 700 "$PRIVATE_ROOT" "$SHARED" "$BACKUP_ROOT"
 exec 9>"$PRIVATE_ROOT/deploy.lock"
 flock -n 9 || fail 'Another deployment is running.'
 
@@ -60,13 +66,31 @@ if ! grep -Eq '^APP_KEY=.+$' "$SHARED/.env"; then
 fi
 chmod 600 "$SHARED/.env"
 
-# From here, errors intentionally leave the site in maintenance mode.
-touch "$WEB_ROOT/.deploying"
-trap 'echo "Deploy interrupted. Maintenance remains enabled; fix the error and run deploy again. Release: $RELEASE" >&2' ERR
+trap 'echo "Deploy interrupted; fix the error and run deploy again. Release: $RELEASE" >&2' ERR
 /bin/bash "$RELEASE/install-database.sh"
 "$PHP_BIN" artisan config:cache --no-interaction
 "$PHP_BIN" artisan route:cache --no-interaction
 "$PHP_BIN" artisan view:cache --no-interaction
+"$PHP_BIN" artisan event:cache --no-interaction
+
+# On the first production deployment, preserve the complete WordPress document
+# root as a recoverable directory. Its database is separate and is not changed.
+if [[ ! -f "$INITIALIZED_MARKER" ]]; then
+    BACKUP_PATH="$BACKUP_ROOT/wordpress-webroot-$(date -u +%Y%m%dT%H%M%SZ)"
+    if [[ -d "$WEB_ROOT" ]]; then
+        mv -- "$WEB_ROOT" "$BACKUP_PATH"
+        printf '%s\n' "$BACKUP_PATH" > "$PRIVATE_ROOT/previous-webroot"
+    fi
+    mkdir -p "$WEB_ROOT"
+    chmod 755 "$WEB_ROOT"
+    if [[ -d "$BACKUP_PATH/.well-known" ]]; then
+        cp -a -- "$BACKUP_PATH/.well-known" "$WEB_ROOT/.well-known"
+    fi
+    touch "$INITIALIZED_MARKER"
+else
+    mkdir -p "$WEB_ROOT"
+fi
+touch "$WEB_ROOT/.deploying"
 
 # Preserve hosting-managed .htaccess sections (PHP handler, Directory Privacy, etc.).
 if [[ -f "$WEB_ROOT/.htaccess" ]]; then
@@ -79,20 +103,20 @@ fi
 {
     printf '\n# BEGIN ANGEL TOUCH DEPLOY\nDirectoryIndex index.php\nOptions -Indexes\n'
     cat public/.htaccess
-    printf '\n<IfModule mod_headers.c>\n    Header always set X-Robots-Tag "noindex, nofollow, noarchive"\n</IfModule>\n'
     printf '<FilesMatch "^\\.">\n    Require all denied\n</FilesMatch>\n# END ANGEL TOUCH DEPLOY\n'
 } >> "$RELEASE/public.htaccess"
 
-# Only public assets reach the web root. No deletion of hosting files or uploads.
-rsync -rlt --exclude='/index.php' --exclude='/.htaccess' --exclude='/hot' \
-    --exclude='/storage' public/ "$WEB_ROOT/"
-printf 'User-agent: *\nDisallow: /\n' > "$WEB_ROOT/robots.txt"
+# Only Laravel public assets reach the web root. Hosting-managed ACME files and
+# runtime logs are retained; stale application assets are removed.
+rsync -rlt --delete --exclude='/index.php' --exclude='/.htaccess' --exclude='/.well-known' \
+    --exclude='/error_log' --exclude='/.deploying' --exclude='/hot' --exclude='/storage' \
+    public/ "$WEB_ROOT/"
 install -m 644 "$RELEASE/public.htaccess" "$WEB_ROOT/.htaccess"
 install -m 644 "$RELEASE/superhosting-index.php" "$WEB_ROOT/index.php"
 ln -s "$RELEASE" "$PRIVATE_ROOT/current-next-$$"
 mv -Tf "$PRIVATE_ROOT/current-next-$$" "$PRIVATE_ROOT/current"
 printf '%s\n' "$REVISION" > "$PRIVATE_ROOT/deployed-commit"
-rm -- "$WEB_ROOT/.deploying"
+rm -f -- "$WEB_ROOT/.deploying"
 trap - ERR
-echo "Deployed $REVISION to https://experiment.angeltouchtherapy.co.uk"
+echo "Deployed $REVISION to https://angeltouchtherapy.co.uk"
 echo 'Verify /up, the home page and /admin/login in your browser. Old releases are retained for recovery.'

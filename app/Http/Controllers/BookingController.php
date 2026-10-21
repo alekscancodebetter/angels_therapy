@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBookingRequest;
+use App\Mail\BookingRequestReceivedBusiness;
+use App\Mail\BookingRequestReceivedCustomer;
 use App\Models\Appointment;
 use App\Models\Customer;
 use App\PhoneNumber;
@@ -11,6 +13,8 @@ use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class BookingController extends Controller
 {
@@ -30,10 +34,10 @@ class BookingController extends Controller
         $durationMinutes = (int) $validated['duration_minutes'];
 
         try {
-            $appointmentCreated = Cache::lock('appointment-booking-'.$startsAt->format('Y-m-d'), 10)->block(5, function () use ($validated, $startsAt, $durationMinutes): bool {
-                return DB::transaction(function () use ($validated, $startsAt, $durationMinutes): bool {
+            $appointment = Cache::lock('appointment-booking-'.$startsAt->format('Y-m-d'), 10)->block(5, function () use ($validated, $startsAt, $durationMinutes): ?Appointment {
+                return DB::transaction(function () use ($validated, $startsAt, $durationMinutes): ?Appointment {
                     if (Appointment::hasConflict($startsAt, $durationMinutes)) {
-                        return false;
+                        return null;
                     }
 
                     $customer = Customer::query()->updateOrCreate(
@@ -44,15 +48,13 @@ class BookingController extends Controller
                         ],
                     );
 
-                    $customer->appointments()->create([
+                    return $customer->appointments()->create([
                         'treatment_slug' => $validated['treatment_slug'],
                         'starts_at' => $startsAt,
                         'duration_minutes' => $durationMinutes,
-                        'status' => Appointment::STATUS_SCHEDULED,
+                        'status' => Appointment::STATUS_PENDING_CONFIRMATION,
                         'notes' => $validated['message'] ?? null,
                     ]);
-
-                    return true;
                 });
             });
         } catch (LockTimeoutException) {
@@ -61,16 +63,36 @@ class BookingController extends Controller
                 ->withErrors(['starts_at' => 'The calendar is busy. Please choose the time again.']);
         }
 
-        if (! $appointmentCreated) {
+        if ($appointment === null) {
             return redirect(route('home').'#booking')
                 ->withInput()
                 ->withErrors(['starts_at' => 'That appointment has just been taken. Please choose another time.']);
         }
+
+        $appointment->load('customer');
+        $this->queueBookingEmails($appointment);
 
         return redirect()->route('booking-confirmation')->with('booking_confirmation', [
             'duration' => $durationMinutes,
             'date' => $startsAt->format('l, j F'),
             'time' => $startsAt->format('g:i A'),
         ]);
+    }
+
+    private function queueBookingEmails(Appointment $appointment): void
+    {
+        try {
+            Mail::to($appointment->customer->email)->queue(
+                (new BookingRequestReceivedCustomer($appointment))->afterCommit(),
+            );
+
+            foreach (config('mail.business_recipients') as $recipient) {
+                Mail::to($recipient)->queue(
+                    (new BookingRequestReceivedBusiness($appointment))->afterCommit(),
+                );
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 }

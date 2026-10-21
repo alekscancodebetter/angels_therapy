@@ -149,8 +149,8 @@ class HomePageTest extends TestCase
             ],
         ])->get(route('booking-confirmation'))
             ->assertOk()
-            ->assertSee('Thank you for booking with us.')
-            ->assertSee('Your appointment has been reserved.')
+            ->assertSee('Thank you for your booking request.')
+            ->assertSee('You will receive a separate email when the appointment is confirmed.')
             ->assertSee('Treatment length')
             ->assertSee('90 minutes')
             ->assertSee('Friday, 16 October')

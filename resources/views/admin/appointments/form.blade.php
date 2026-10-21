@@ -13,7 +13,7 @@
     $treatmentOptions = collect(['' => 'General massage appointment'])
         ->merge(collect(config('treatments'))->map(fn (array $treatment): string => $treatment['title']));
     $selectedDuration = (int) old('duration_minutes', $editingAppointment->duration_minutes ?? config('booking.duration_minutes'));
-    $statusOptions = ['scheduled' => 'Scheduled', 'completed' => 'Completed', 'cancelled' => 'Cancelled', 'no_show' => 'No show'];
+    $statusOptions = ['pending_confirmation' => 'Pending confirmation', 'scheduled' => 'Scheduled', 'completed' => 'Completed', 'cancelled' => 'Cancelled', 'no_show' => 'No show'];
     $selectedStatus = (string) old('status', $editingAppointment->status ?? 'scheduled');
     [$openingHour, $openingMinute] = array_map('intval', explode(':', config('booking.opening_time')));
     [$closingHour, $closingMinute] = array_map('intval', explode(':', config('booking.closing_time')));

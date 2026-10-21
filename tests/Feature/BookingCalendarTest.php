@@ -181,7 +181,7 @@ class BookingCalendarTest extends TestCase
         $this->assertSame('sports-massage', $appointment->treatment_slug);
         $this->assertSame('2026-10-16 10:00', $appointment->starts_at->format('Y-m-d H:i'));
         $this->assertSame(90, $appointment->duration_minutes);
-        $this->assertSame(Appointment::STATUS_SCHEDULED, $appointment->status);
+        $this->assertSame(Appointment::STATUS_PENDING_CONFIRMATION, $appointment->status);
         $this->assertSame('Please focus on my shoulders.', $appointment->notes);
 
         $admin = User::factory()->admin()->create();

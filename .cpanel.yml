@@ -1,4 +1,4 @@
 ---
 deployment:
   tasks:
-    - /bin/bash /home/nikkiebl/repositories/angels_therapy/deploy-superhosting.sh
+    - /bin/bash /home/nikkiebl/repositories/angels_therapy_production/deploy-superhosting.sh

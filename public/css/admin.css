@@ -91,6 +91,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .admin-appointment-row small, .admin-compact-list small { color: var(--admin-muted); }
 .status { display: inline-flex; align-items: center; justify-content: center; min-height: 25px; padding: 0 9px; color: #486274; background: #edf3f6; border-radius: 100px; font-size: 10px; letter-spacing: .06em; text-transform: capitalize; white-space: nowrap; }
 .status--scheduled { color: #28688f; background: #e4f2f8; }
+.status--pending_confirmation { color: #8a5a18; background: #fff1d6; }
 .status--completed { color: #277158; background: #e4f4ed; }
 .status--cancelled, .status--no_show { color: #9a4c50; background: #f8e8e9; }
 .admin-empty { display: grid; min-height: 190px; place-items: center; align-content: center; text-align: center; }

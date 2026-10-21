@@ -7,17 +7,17 @@
     @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="title" content="Booking confirmed | Angel Touch Therapy">
-    <meta name="description" content="Your massage appointment with Angel Touch Therapy has been booked.">
+    <meta name="title" content="Booking request received | Angel Touch Therapy">
+    <meta name="description" content="Your massage appointment request has been received by Angel Touch Therapy.">
     <meta name="theme-color" content="#2f6f9f">
     <meta name="robots" content="noindex, nofollow">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Angel Touch Therapy">
     <meta property="og:locale" content="en_GB">
-    <meta property="og:title" content="Booking confirmed | Angel Touch Therapy">
-    <meta property="og:description" content="Your massage appointment with Angel Touch Therapy has been booked.">
+    <meta property="og:title" content="Booking request received | Angel Touch Therapy">
+    <meta property="og:description" content="Your massage appointment request has been received by Angel Touch Therapy.">
     <meta property="og:url" content="{{ $canonicalUrl }}">
-    <title>Booking confirmed | Angel Touch Therapy</title>
+    <title>Booking request received | Angel Touch Therapy</title>
     <link rel="canonical" href="{{ $canonicalUrl }}">
     @include('favicons')
     @include('google-ads', ['bookingCompleted' => true])
@@ -69,11 +69,11 @@
             <div class="confirmation-hero__orb confirmation-hero__orb--one" aria-hidden="true"></div>
             <div class="confirmation-hero__orb confirmation-hero__orb--two" aria-hidden="true"></div>
             <div class="container confirmation-hero__content">
-                <p class="eyebrow eyebrow--gold">Booking confirmed</p>
+                <p class="eyebrow eyebrow--gold">Booking request received</p>
                 <div class="confirmation-card">
                     <span class="confirmation-card__mark" aria-hidden="true">✓</span>
-                    <h1 id="confirmation-title">Thank you for booking with us.</h1>
-                    <p class="confirmation-card__intro">Your appointment has been reserved. We look forward to welcoming you to Angel Touch Therapy.</p>
+                    <h1 id="confirmation-title">Thank you for your booking request.</h1>
+                    <p class="confirmation-card__intro">We have reserved this time while Villy reviews your request. You will receive a separate email when the appointment is confirmed.</p>
 
                     @if (is_array($confirmation))
                         <dl class="confirmation-details" aria-label="Appointment details">

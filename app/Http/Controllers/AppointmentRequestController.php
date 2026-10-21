@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AppointmentRequestReceivedBusiness;
+use App\Mail\AppointmentRequestReceivedCustomer;
 use App\Models\AppointmentRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class AppointmentRequestController extends Controller
 {
@@ -20,8 +24,26 @@ class AppointmentRequestController extends Controller
             'message' => ['required', 'string', 'max:3000'],
         ]);
 
-        AppointmentRequest::create($validated);
+        $appointmentRequest = AppointmentRequest::create($validated);
+        $this->queueAppointmentRequestEmails($appointmentRequest);
 
         return back()->with('status', 'Thank you. Your appointment request has been received.');
+    }
+
+    private function queueAppointmentRequestEmails(AppointmentRequest $appointmentRequest): void
+    {
+        try {
+            Mail::to($appointmentRequest->email)->queue(
+                (new AppointmentRequestReceivedCustomer($appointmentRequest))->afterCommit(),
+            );
+
+            foreach (config('mail.business_recipients') as $recipient) {
+                Mail::to($recipient)->queue(
+                    (new AppointmentRequestReceivedBusiness($appointmentRequest))->afterCommit(),
+                );
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 }

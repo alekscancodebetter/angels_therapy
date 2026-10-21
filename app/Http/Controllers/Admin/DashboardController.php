@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $today = now()->startOfDay();
 
         $stats = [
-            'upcomingAppointments' => Appointment::query()->where('status', 'scheduled')->where('starts_at', '>=', $today)->count(),
+            'upcomingAppointments' => Appointment::query()->whereIn('status', Appointment::BLOCKING_STATUSES)->where('starts_at', '>=', $today)->count(),
             'customers' => Customer::query()->count(),
             'newCustomersThisMonth' => Customer::query()->whereBetween('created_at', [$today->copy()->startOfMonth(), $today->copy()->endOfMonth()])->count(),
         ];
@@ -29,7 +29,7 @@ class DashboardController extends Controller
 
         $upcomingAppointments = Appointment::query()
             ->with('customer')
-            ->where('status', 'scheduled')
+            ->whereIn('status', Appointment::BLOCKING_STATUSES)
             ->where('starts_at', '>=', $today)
             ->orderBy('starts_at')
             ->limit(6)

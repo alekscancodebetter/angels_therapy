@@ -21,6 +21,13 @@ class Appointment extends Model
 
     public const STATUS_SCHEDULED = 'scheduled';
 
+    public const STATUS_PENDING_CONFIRMATION = 'pending_confirmation';
+
+    public const BLOCKING_STATUSES = [
+        self::STATUS_PENDING_CONFIRMATION,
+        self::STATUS_SCHEDULED,
+    ];
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
@@ -45,7 +52,7 @@ class Appointment extends Model
         $slotEndsAt = $slotStartsAt->addMinutes($durationMinutes);
 
         $appointments = self::query()
-            ->where('status', self::STATUS_SCHEDULED)
+            ->whereIn('status', self::BLOCKING_STATUSES)
             ->when($ignoredAppointmentId, fn ($query, int $appointmentId) => $query->whereKeyNot($appointmentId))
             ->where('starts_at', '>=', $slotStartsAt->subMinutes(self::MAX_DURATION_MINUTES))
             ->where('starts_at', '<', $slotEndsAt)
@@ -90,7 +97,7 @@ class Appointment extends Model
         $durationMinutes ??= (int) config('booking.duration_minutes');
         $intervalMinutes = (int) config('booking.interval_minutes');
         $appointments = self::query()
-            ->where('status', self::STATUS_SCHEDULED)
+            ->whereIn('status', self::BLOCKING_STATUSES)
             ->where('starts_at', '>=', $monthStartsAt->startOfDay()->subMinutes(self::MAX_DURATION_MINUTES))
             ->where('starts_at', '<=', $monthEndsAt->endOfDay())
             ->orderBy('starts_at')
@@ -200,6 +207,11 @@ class Appointment extends Model
         [$hours, $minutes] = array_map('intval', explode(':', $time));
 
         return $date->setTime($hours, $minutes);
+    }
+
+    public static function blocksAvailability(string $status): bool
+    {
+        return in_array($status, self::BLOCKING_STATUSES, true);
     }
 
     protected function casts(): array

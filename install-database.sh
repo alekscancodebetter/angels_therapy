@@ -11,8 +11,8 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 require "vendor/autoload.php";
 $app = require "bootstrap/app.php";
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-if (config("database.default") !== "mysql" || config("app.debug") || config("app.url") !== "https://experiment.angeltouchtherapy.co.uk") {
-    fwrite(STDERR, "Expected the experiment MySQL configuration, HTTPS APP_URL and APP_DEBUG=false.\n");
+if (config("database.default") !== "mysql" || config("app.debug") || config("app.url") !== "https://angeltouchtherapy.co.uk") {
+    fwrite(STDERR, "Expected the production MySQL configuration, HTTPS APP_URL and APP_DEBUG=false.\n");
     exit(1);
 }
 foreach (["database", "username", "password"] as $field) {

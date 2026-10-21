@@ -431,14 +431,14 @@
                             <span>I have read and accept the <a href="{{ route('terms-and-conditions') }}" target="_blank" rel="noopener noreferrer">Terms &amp; Conditions<span class="visually-hidden"> (opens in a new tab)</span></a>.</span>
                         </label>
                         @error('terms_accepted')<small class="booking-field-error" id="terms_accepted_error">{{ $message }}</small>@enderror
-                        <button class="button button--gold booking-submit" type="submit" data-booking-submit @disabled(! old('starts_at'))>Confirm appointment</button>
+                        <button class="button button--gold booking-submit" type="submit" data-booking-submit @disabled(! old('starts_at'))>Request appointment</button>
                     </section>
                 </form>
 
                 <div class="practice-info reveal">
                     <div class="contact__details">
                         <p class="eyebrow anchor-target" id="contact">Practice details</p><h2 id="contact-title">Everything you need for your visit.</h2>
-                        <p>Your selected appointment will also appear in Villy’s admin calendar immediately.</p>
+                            <p>Your requested appointment will appear in Villy’s admin calendar immediately and will be confirmed by email.</p>
                     </div>
                     <div class="contact__cards">
                         <a href="tel:+447915910033"><small>Telephone</small><strong>(+44) 7915 910 033</strong></a>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Models\Appointment;
 use App\PhoneNumber;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
@@ -32,7 +33,13 @@ class StoreAppointmentRequest extends FormRequest
             'appointment_time' => ['nullable', 'date_format:H:i'],
             'starts_at' => ['required', 'date'],
             'duration_minutes' => ['required', 'integer', Rule::in(array_map('intval', array_keys(config('booking.duration_options'))))],
-            'status' => ['required', Rule::in(['scheduled', 'completed', 'cancelled', 'no_show'])],
+            'status' => ['required', Rule::in([
+                Appointment::STATUS_PENDING_CONFIRMATION,
+                Appointment::STATUS_SCHEDULED,
+                'completed',
+                'cancelled',
+                'no_show',
+            ])],
             'notes' => ['nullable', 'string', 'max:5000'],
         ];
     }

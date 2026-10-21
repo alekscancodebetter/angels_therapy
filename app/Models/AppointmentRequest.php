@@ -25,6 +25,7 @@ class AppointmentRequest extends Model
     {
         return [
             'handled_at' => 'datetime',
+            'message' => 'encrypted',
         ];
     }
 }

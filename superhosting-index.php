@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-$applicationPath = '/home/nikkiebl/angels-therapy-experiment/current';
+$applicationPath = '/home/nikkiebl/angels-therapy-production/current';
 
 if (is_file(__DIR__.'/.deploying') || ! is_file($applicationPath.'/vendor/autoload.php')) {
     http_response_code(503);
