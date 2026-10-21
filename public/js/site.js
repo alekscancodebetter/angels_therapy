@@ -823,39 +823,56 @@
 
     const cookieConsent = document.querySelector('[data-cookie-consent]');
     const cookieConsentStorageKey = 'angel-touch-cookie-consent-v3';
-    const googleAds = window.angelTouchGoogleAds;
+    const google = window.angelTouchGoogle;
     const metaAds = window.angelTouchMetaAds;
-    let googleAdsConsentGranted = false;
-    let googleAdsLoaded = false;
+    let googleConsentGranted = false;
+    let googleLoaded = false;
     let bookingConversionSent = false;
     let metaAdsConsentGranted = false;
     let metaAdsLoaded = false;
     let metaBookingEventSent = false;
 
-    const sendGoogleAdsConversion = (label, value, currency) => {
-        if (!googleAdsConsentGranted || !googleAds?.tagId || !label || typeof window.gtag !== 'function') return;
+    const sendGoogleEvent = (eventName, label, value, currency) => {
+        if (!googleConsentGranted || !google) return;
 
-        const conversion = {
-            send_to: googleAds.tagId + '/' + label,
-        };
         const numericValue = value === null || value === '' || typeof value === 'undefined'
             ? null
             : Number(value);
+        const eventParameters = {};
 
-        if (numericValue !== null && Number.isFinite(numericValue)) conversion.value = numericValue;
-        if (currency) conversion.currency = currency;
+        if (numericValue !== null && Number.isFinite(numericValue)) eventParameters.value = numericValue;
+        if (currency) eventParameters.currency = currency;
 
-        window.gtag('event', 'conversion', conversion);
+        if (google.mode === 'tag_manager') {
+            window.dataLayer?.push({
+                event: 'angel_touch_' + eventName,
+                google_ads_tag_id: google.adsTagId,
+                google_ads_conversion_label: label,
+                ...eventParameters,
+            });
+            return;
+        }
+
+        if (typeof window.gtag !== 'function') return;
+
+        window.gtag('event', eventName, eventParameters);
+
+        if (google.adsTagId && label) {
+            window.gtag('event', 'conversion', {
+                send_to: google.adsTagId + '/' + label,
+                ...eventParameters,
+            });
+        }
     };
 
-    const loadGoogleAds = () => {
-        if (!googleAds?.tagId || googleAdsLoaded) return;
+    const loadGoogleTracking = () => {
+        if (!google || googleLoaded) return;
 
         window.dataLayer = window.dataLayer || [];
         window.gtag = window.gtag || function () {
             window.dataLayer.push(arguments);
         };
-        googleAdsConsentGranted = true;
+        googleConsentGranted = true;
         window.gtag('consent', 'default', {
             ad_storage: 'denied',
             analytics_storage: 'denied',
@@ -867,28 +884,51 @@
         });
         window.gtag('consent', 'update', {
             ad_storage: 'granted',
-            analytics_storage: 'denied',
+            analytics_storage: 'granted',
             ad_user_data: 'granted',
             ad_personalization: 'granted',
         });
-        window.gtag('js', new Date());
-        window.gtag('config', googleAds.tagId);
-        googleAdsLoaded = true;
 
-        if (!document.querySelector('script[data-google-ads-tag]')) {
-            const googleAdsScript = document.createElement('script');
-            googleAdsScript.async = true;
-            googleAdsScript.dataset.googleAdsTag = 'true';
-            googleAdsScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(googleAds.tagId);
-            document.head.appendChild(googleAdsScript);
+        if (google.mode === 'tag_manager' && google.tagManagerContainerId) {
+            window.dataLayer.push({ 'gtm.start': Date.now(), event: 'gtm.js' });
+
+            if (!document.querySelector('script[data-google-tag-manager]')) {
+                const tagManagerScript = document.createElement('script');
+                tagManagerScript.async = true;
+                tagManagerScript.dataset.googleTagManager = 'true';
+                tagManagerScript.src = 'https://www.googletagmanager.com/gtm.js?id=' + encodeURIComponent(google.tagManagerContainerId);
+                document.head.appendChild(tagManagerScript);
+            }
+        } else {
+            const googleIds = [...new Set([
+                google.tagId,
+                google.analyticsMeasurementId,
+                google.adsTagId,
+            ].filter(Boolean))];
+
+            if (!googleIds.length) return;
+
+            window.gtag('js', new Date());
+            googleIds.forEach((googleId) => window.gtag('config', googleId));
+
+            if (!document.querySelector('script[data-google-tag]')) {
+                const googleTagScript = document.createElement('script');
+                googleTagScript.async = true;
+                googleTagScript.dataset.googleTag = 'true';
+                googleTagScript.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(googleIds[0]);
+                document.head.appendChild(googleTagScript);
+            }
         }
 
-        if (googleAds.bookingCompleted && !bookingConversionSent) {
+        googleLoaded = true;
+
+        if (google.bookingCompleted && !bookingConversionSent) {
             bookingConversionSent = true;
-            sendGoogleAdsConversion(
-                googleAds.bookingConversionLabel,
-                googleAds.bookingConversionValue,
-                googleAds.bookingConversionCurrency,
+            sendGoogleEvent(
+                'booking_completed',
+                google.bookingConversionLabel,
+                google.bookingConversionValue,
+                google.bookingConversionCurrency,
             );
         }
     };
@@ -944,16 +984,35 @@
     };
 
     const loadAdvertisingTags = () => {
-        loadGoogleAds();
+        loadGoogleTracking();
         loadMetaAds();
+    };
+
+    const revokeOptionalTracking = () => {
+        googleConsentGranted = false;
+        metaAdsConsentGranted = false;
+
+        if (typeof window.gtag === 'function') {
+            window.gtag('consent', 'update', {
+                ad_storage: 'denied',
+                analytics_storage: 'denied',
+                ad_user_data: 'denied',
+                ad_personalization: 'denied',
+            });
+        }
+
+        if (typeof window.fbq === 'function') {
+            window.fbq('consent', 'revoke');
+        }
     };
 
     document.querySelectorAll('a[href^="tel:"]').forEach((phoneLink) => {
         phoneLink.addEventListener('click', () => {
-            sendGoogleAdsConversion(
-                googleAds?.phoneConversionLabel,
-                googleAds?.phoneConversionValue,
-                googleAds?.phoneConversionCurrency,
+            sendGoogleEvent(
+                'phone_click',
+                google?.phoneConversionLabel,
+                google?.phoneConversionValue,
+                google?.phoneConversionCurrency,
             );
             sendMetaAdsEvent(metaAds?.phoneEventName);
         });
@@ -1010,7 +1069,11 @@
                     // The choice still applies for this page when browser storage is unavailable.
                 }
 
-                if (button.dataset.cookieChoice === 'all') loadAdvertisingTags();
+                if (button.dataset.cookieChoice === 'all') {
+                    loadAdvertisingTags();
+                } else {
+                    revokeOptionalTracking();
+                }
                 hideCookieConsent();
             });
         });

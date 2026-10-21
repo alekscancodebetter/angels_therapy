@@ -61,6 +61,7 @@ class HomePageTest extends TestCase
             ->assertSee('Essential cookies')
             ->assertSee('External media')
             ->assertSee('Advertising and measurement')
+            ->assertSee('Google Analytics, Google Ads and Meta Ads')
             ->assertSee('Use essential only')
             ->assertSee('Accept all');
     }
@@ -94,6 +95,25 @@ class HomePageTest extends TestCase
             ->assertOk()
             ->assertSee('bookingCompleted: true', false)
             ->assertSee('meta-ads-config', false);
+    }
+
+    public function test_google_analytics_and_tag_manager_configuration_can_be_rendered(): void
+    {
+        Config::set('google_tracking.analytics_measurement_id', 'G-ABC123DEF4');
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('google-ads-config', false)
+            ->assertSee('G-ABC123DEF4', false)
+            ->assertSee('analyticsMeasurementId', false);
+
+        Config::set('google_tracking.mode', 'tag_manager');
+        Config::set('google_tracking.tag_manager_container_id', 'GTM-ABC1234');
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('GTM-ABC1234', false)
+            ->assertSee('tagManagerContainerId', false);
     }
 
     public function test_google_reviews_appear_near_the_top_of_the_page_and_link_to_google(): void

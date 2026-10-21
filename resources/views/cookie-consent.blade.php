@@ -18,7 +18,7 @@
         </header>
 
         <div class="cookie-consent__body">
-            <p id="cookie-consent-description">We use essential cookies to keep booking and contact forms secure. Optional Google and Meta Ads measurement is only enabled after you accept. External YouTube content is only loaded when you choose to play a video.</p>
+            <p id="cookie-consent-description">We use essential cookies to keep booking and contact forms secure. Optional Google Analytics, Google Ads and Meta Ads measurement is only enabled after you accept. External YouTube content is only loaded when you choose to play a video.</p>
 
             <div class="cookie-consent__types" aria-label="Cookie categories">
                 <div class="cookie-consent__type">
@@ -33,7 +33,7 @@
                 </div>
                 <div class="cookie-consent__type">
                     <span aria-hidden="true">◈</span>
-                    <div><strong>Advertising and measurement</strong><small>Google and Meta Ads may measure visits, bookings and phone-link clicks after you accept.</small></div>
+                    <div><strong>Advertising and measurement</strong><small>Google Analytics, Google Ads and Meta Ads may measure visits, bookings and phone-link clicks after you accept.</small></div>
                     <em>Optional</em>
                 </div>
             </div>

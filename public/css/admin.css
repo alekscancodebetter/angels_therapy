@@ -204,6 +204,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .admin-form-actions > a { color: var(--admin-muted); }
 .admin-errors { padding: 14px 17px; color: #8a3f45; background: #fff0f1; border: 1px solid #efc6c9; border-radius: 10px; }
 .admin-errors ul { margin: 6px 0 0; padding-left: 20px; }
+.admin-settings-form { max-width: 900px; }
+.admin-settings-form .admin-form-panel { max-width: none; }
+.admin-settings-help { margin: -5px 0 22px; color: var(--admin-muted); }
+.admin-tracking-heading { align-items: center; }
+.admin-integration-status { display: inline-flex; min-height: 27px; align-items: center; padding: 0 10px; color: #7b5a21 !important; background: #fff8e7; border: 1px solid #ead8a3; border-radius: 999px; font-size: 10px !important; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.admin-integration-status.is-configured { color: #276b54 !important; background: #e8f6f0; border-color: #bce1d2; }
+.admin-settings-divider { display: flex; align-items: baseline; gap: 10px; margin-top: 5px; padding: 12px 0 2px; border-top: 1px solid var(--admin-line); }
+.admin-settings-divider strong { color: var(--admin-navy); }
+.admin-settings-divider span, .admin-settings-actions > span { color: var(--admin-muted); font-size: 12px; }
 
 .admin-profile-grid { display: grid; grid-template-columns: minmax(260px,.7fr) minmax(0,1.3fr); gap: 18px; margin-bottom: 18px; }
 .customer-profile-card { text-align: center; }
