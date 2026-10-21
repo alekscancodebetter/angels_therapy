@@ -33,6 +33,13 @@ class LoadMarketingSettings
                     'google_ads.phone_conversion_label' => $settings->google_ads_phone_conversion_label,
                     'google_ads.phone_conversion_value' => $settings->google_ads_phone_conversion_value,
                     'google_ads.phone_conversion_currency' => $settings->google_ads_phone_conversion_currency,
+                    'meta_ads.pixel_id' => $settings->meta_pixel_id,
+                    'meta_ads.booking_event_name' => $settings->meta_booking_event_name,
+                    'meta_ads.booking_event_value' => $settings->meta_booking_event_value,
+                    'meta_ads.booking_event_currency' => $settings->meta_booking_event_currency,
+                    'meta_ads.phone_event_name' => $settings->meta_phone_event_name,
+                    'meta_ads.phone_event_value' => $settings->meta_phone_event_value,
+                    'meta_ads.phone_event_currency' => $settings->meta_phone_event_currency,
                 ]);
             }
         }

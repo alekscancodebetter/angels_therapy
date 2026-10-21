@@ -19,6 +19,13 @@ use Illuminate\Database\Eloquent\Model;
     'google_ads_phone_conversion_label',
     'google_ads_phone_conversion_value',
     'google_ads_phone_conversion_currency',
+    'meta_pixel_id',
+    'meta_booking_event_name',
+    'meta_booking_event_value',
+    'meta_booking_event_currency',
+    'meta_phone_event_name',
+    'meta_phone_event_value',
+    'meta_phone_event_currency',
 ])]
 class MarketingSetting extends Model
 {
@@ -31,6 +38,8 @@ class MarketingSetting extends Model
         return [
             'google_ads_booking_conversion_value' => 'decimal:2',
             'google_ads_phone_conversion_value' => 'decimal:2',
+            'meta_booking_event_value' => 'decimal:2',
+            'meta_phone_event_value' => 'decimal:2',
         ];
     }
 }

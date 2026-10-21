@@ -866,7 +866,18 @@
     };
 
     const loadGoogleTracking = () => {
-        if (!google || googleLoaded) return;
+        if (!google) return;
+
+        if (googleLoaded) {
+            googleConsentGranted = true;
+            window.gtag?.('consent', 'update', {
+                ad_storage: 'granted',
+                analytics_storage: 'granted',
+                ad_user_data: 'granted',
+                ad_personalization: 'granted',
+            });
+            return;
+        }
 
         window.dataLayer = window.dataLayer || [];
         window.gtag = window.gtag || function () {
@@ -948,7 +959,13 @@
     };
 
     const loadMetaAds = () => {
-        if (!metaAds?.pixelId || metaAdsLoaded) return;
+        if (!metaAds?.pixelId) return;
+
+        if (metaAdsLoaded) {
+            metaAdsConsentGranted = true;
+            window.fbq?.('consent', 'grant');
+            return;
+        }
 
         window.fbq = window.fbq || function () {
             window.fbq.callMethod
@@ -961,6 +978,7 @@
         window.fbq.version = '2.0';
         window.fbq.queue = [];
         metaAdsConsentGranted = true;
+        window.fbq('consent', 'grant');
         window.fbq('init', metaAds.pixelId);
         window.fbq('track', 'PageView');
         metaAdsLoaded = true;
@@ -1014,7 +1032,11 @@
                 google?.phoneConversionValue,
                 google?.phoneConversionCurrency,
             );
-            sendMetaAdsEvent(metaAds?.phoneEventName);
+            sendMetaAdsEvent(
+                metaAds?.phoneEventName,
+                metaAds?.phoneEventValue,
+                metaAds?.phoneEventCurrency,
+            );
         });
     });
 

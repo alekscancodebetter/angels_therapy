@@ -24,6 +24,13 @@ class MarketingSettingSeeder extends Seeder
             'google_ads_phone_conversion_label' => config('google_ads.phone_conversion_label'),
             'google_ads_phone_conversion_value' => config('google_ads.phone_conversion_value'),
             'google_ads_phone_conversion_currency' => config('google_ads.phone_conversion_currency'),
+            'meta_pixel_id' => config('meta_ads.pixel_id'),
+            'meta_booking_event_name' => config('meta_ads.booking_event_name'),
+            'meta_booking_event_value' => config('meta_ads.booking_event_value'),
+            'meta_booking_event_currency' => config('meta_ads.booking_event_currency'),
+            'meta_phone_event_name' => config('meta_ads.phone_event_name'),
+            'meta_phone_event_value' => config('meta_ads.phone_event_value'),
+            'meta_phone_event_currency' => config('meta_ads.phone_event_currency'),
         ]);
     }
 }

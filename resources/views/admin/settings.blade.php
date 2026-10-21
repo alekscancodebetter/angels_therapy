@@ -9,10 +9,11 @@
             || filled(old('google_analytics_measurement_id', $marketingSettings->google_analytics_measurement_id))
             || filled(old('google_ads_tag_id', $marketingSettings->google_ads_tag_id));
         $tagManagerConfigured = filled(old('google_tag_manager_container_id', $marketingSettings->google_tag_manager_container_id));
+        $metaConfigured = filled(old('meta_pixel_id', $marketingSettings->meta_pixel_id));
     @endphp
 
     <div class="admin-page-heading">
-        <div><p class="admin-eyebrow">ACCOUNT &amp; INTEGRATIONS</p><h1>Admin settings</h1><p>Update sign-in details and manage consent-gated Google measurement.</p></div>
+        <div><p class="admin-eyebrow">ACCOUNT &amp; INTEGRATIONS</p><h1>Admin settings</h1><p>Update sign-in details and manage consent-gated Google and Meta measurement.</p></div>
     </div>
 
     @include('admin.partials.errors')
@@ -66,6 +67,42 @@
                 <label>Phone-click conversion label<input type="text" name="google_ads_phone_conversion_label" value="{{ old('google_ads_phone_conversion_label', $marketingSettings->google_ads_phone_conversion_label) }}" maxlength="100" placeholder="QrStUVwxyz12345"></label>
                 <label>Phone-click value<input type="number" name="google_ads_phone_conversion_value" value="{{ old('google_ads_phone_conversion_value', $marketingSettings->google_ads_phone_conversion_value) }}" min="0" max="99999999" step="0.01" inputmode="decimal" placeholder="1.00"></label>
                 <label>Phone-click currency<input type="text" name="google_ads_phone_conversion_currency" value="{{ old('google_ads_phone_conversion_currency', $marketingSettings->google_ads_phone_conversion_currency ?: 'GBP') }}" minlength="3" maxlength="3" placeholder="GBP" required></label>
+            </div>
+        </section>
+
+        <section class="admin-panel admin-form-panel">
+            <div class="admin-panel-heading admin-tracking-heading">
+                <div><p class="admin-eyebrow">META</p><h2>Meta Pixel</h2></div>
+                <span class="admin-integration-status {{ $metaConfigured ? 'is-configured' : '' }}">
+                    {{ $metaConfigured ? 'Configured' : 'Needs Pixel ID' }}
+                </span>
+            </div>
+            <p class="admin-settings-help">The Pixel loads only after “Accept all”. It records PageView automatically, plus the selected booking and phone-click events.</p>
+
+            <div class="admin-form-grid">
+                <label class="admin-form-wide">Meta Pixel ID <small>Find this numeric ID in Meta Events Manager → Data sources.</small><input type="text" name="meta_pixel_id" value="{{ old('meta_pixel_id', $marketingSettings->meta_pixel_id) }}" maxlength="30" inputmode="numeric" pattern="[0-9]+" placeholder="123456789012345" spellcheck="false"></label>
+
+                <div class="admin-settings-divider admin-form-wide"><strong>Completed booking</strong><span>Sent once on the booking confirmation page.</span></div>
+                <label>Meta event
+                    <select name="meta_booking_event_name" required>
+                        @foreach (['Schedule', 'Lead', 'Contact', 'CompleteRegistration'] as $eventName)
+                            <option value="{{ $eventName }}" @selected(old('meta_booking_event_name', $marketingSettings->meta_booking_event_name ?: 'Schedule') === $eventName)>{{ $eventName }}</option>
+                        @endforeach
+                    </select>
+                </label>
+                <label>Booking value<input type="number" name="meta_booking_event_value" value="{{ old('meta_booking_event_value', $marketingSettings->meta_booking_event_value) }}" min="0" max="99999999" step="0.01" inputmode="decimal" placeholder="0.00"></label>
+                <label>Booking currency<input type="text" name="meta_booking_event_currency" value="{{ old('meta_booking_event_currency', $marketingSettings->meta_booking_event_currency ?: 'GBP') }}" minlength="3" maxlength="3" placeholder="GBP" required></label>
+
+                <div class="admin-settings-divider admin-form-wide"><strong>Phone click</strong><span>Sent when a visitor selects a telephone link.</span></div>
+                <label>Meta event
+                    <select name="meta_phone_event_name" required>
+                        @foreach (['Contact', 'Lead'] as $eventName)
+                            <option value="{{ $eventName }}" @selected(old('meta_phone_event_name', $marketingSettings->meta_phone_event_name ?: 'Contact') === $eventName)>{{ $eventName }}</option>
+                        @endforeach
+                    </select>
+                </label>
+                <label>Phone-click value<input type="number" name="meta_phone_event_value" value="{{ old('meta_phone_event_value', $marketingSettings->meta_phone_event_value) }}" min="0" max="99999999" step="0.01" inputmode="decimal" placeholder="0.00"></label>
+                <label>Phone-click currency<input type="text" name="meta_phone_event_currency" value="{{ old('meta_phone_event_currency', $marketingSettings->meta_phone_event_currency ?: 'GBP') }}" minlength="3" maxlength="3" placeholder="GBP" required></label>
             </div>
         </section>
 

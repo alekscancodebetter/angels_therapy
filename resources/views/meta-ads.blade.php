@@ -11,6 +11,8 @@
             bookingEventValue: @json(config('meta_ads.booking_event_value')),
             bookingEventCurrency: @json(config('meta_ads.booking_event_currency')),
             phoneEventName: @json(config('meta_ads.phone_event_name')),
+            phoneEventValue: @json(config('meta_ads.phone_event_value')),
+            phoneEventCurrency: @json(config('meta_ads.phone_event_currency')),
         };
     </script>
 @endif

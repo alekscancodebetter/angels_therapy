@@ -31,6 +31,13 @@ class UpdateSettingsRequest extends FormRequest
             'google_ads_phone_conversion_label' => ['nullable', 'string', 'max:100'],
             'google_ads_phone_conversion_value' => ['nullable', 'numeric', 'min:0', 'max:99999999'],
             'google_ads_phone_conversion_currency' => ['required', 'alpha', 'size:3'],
+            'meta_pixel_id' => ['nullable', 'string', 'max:30', 'regex:/^[0-9]+$/'],
+            'meta_booking_event_name' => ['required', Rule::in(['Schedule', 'Lead', 'Contact', 'CompleteRegistration'])],
+            'meta_booking_event_value' => ['nullable', 'numeric', 'min:0', 'max:99999999'],
+            'meta_booking_event_currency' => ['required', 'alpha', 'size:3'],
+            'meta_phone_event_name' => ['required', Rule::in(['Contact', 'Lead'])],
+            'meta_phone_event_value' => ['nullable', 'numeric', 'min:0', 'max:99999999'],
+            'meta_phone_event_currency' => ['required', 'alpha', 'size:3'],
         ];
     }
 }

@@ -24,6 +24,11 @@ class MarketingSettingFactory extends Factory
             'google_ads_tag_id' => 'AW-'.fake()->numerify('#########'),
             'google_ads_booking_conversion_currency' => 'GBP',
             'google_ads_phone_conversion_currency' => 'GBP',
+            'meta_pixel_id' => fake()->numerify('###############'),
+            'meta_booking_event_name' => 'Schedule',
+            'meta_booking_event_currency' => 'GBP',
+            'meta_phone_event_name' => 'Contact',
+            'meta_phone_event_currency' => 'GBP',
         ];
     }
 }
