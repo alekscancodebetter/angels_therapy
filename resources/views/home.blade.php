@@ -190,11 +190,12 @@
 
         <section class="about section" aria-labelledby="about-title">
             <div class="about__image reveal">
-                <x-responsive-image
+                <img
                     class="about__image-media"
-                    src="images/angel-touch-hero.png"
-                    alt="Warm massage treatment room at Angel Touch Therapy in Harrogate"
-                    sizes="(max-width: 820px) 100vw, 50vw"
+                    src="{{ asset('images/villy-massage-treatment.png') }}"
+                    alt="Villy providing a leg massage at Angel Touch Therapy in Harrogate"
+                    width="540"
+                    height="960"
                     loading="lazy"
                     decoding="async"
                     fetchpriority="low"

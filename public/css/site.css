@@ -176,9 +176,9 @@ blockquote footer span { color: #7a817f; font-weight: 500; }
 .condition-list span { color: #86775f; font-family: var(--sans); font-size: .63rem; letter-spacing: .12em; }
 
 .about { padding: 0; display: grid; grid-template-columns: 1fr 1fr; min-height: 920px; background: var(--paper); }
-.about__image { position: relative; min-height: 760px; overflow: hidden; background: var(--forest-deep); }
-.about__image::after { position: absolute; inset: 0; content: ''; background: linear-gradient(rgba(47,111,159,.03), rgba(47,111,159,.14)); pointer-events: none; }
-.about__image-media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 72% center; }
+.about.section { padding: 0; }
+.about__image { display: flex; align-items: center; justify-content: center; min-width: 0; padding: clamp(32px, 4vw, 64px); background: radial-gradient(ellipse at 32% 32%, rgba(117,196,236,.26), transparent 66%), radial-gradient(ellipse at 62% 72%, rgba(236,207,130,.25), transparent 62%), var(--paper); }
+.about__image-media { display: block; width: 100%; max-width: 540px; height: auto; border-radius: 32px; outline: 1px solid rgba(198,165,104,.35); outline-offset: 8px; box-shadow: 0 24px 60px -24px rgba(29,72,103,.3), 0 6px 20px rgba(29,72,103,.08); }
 .about__content { max-width: 720px; padding: clamp(80px, 9vw, 150px) clamp(40px, 8vw, 120px); align-self: center; }
 .about__content h2 { margin-bottom: 40px; font-size: clamp(2.8rem, 4.7vw, 5rem); }
 .about__content > p:not(.eyebrow) { color: #586579; }
@@ -711,9 +711,10 @@ blockquote footer span { color: #7a817f; font-weight: 500; }
     .treatment-row__number { padding-top: 6px; }
     .treatment-row p { grid-column: 2 / -1; }
     .conditions__lead { position: static; }
-    .about { grid-template-columns: 1fr; }
-    .about__image { min-height: 580px; }
-    .about__content { max-width: none; padding: 90px 35px; }
+    .about { --about-content-top: 90px; grid-template-columns: 1fr; }
+    .about__image { padding: 28px; }
+    .about__image-media { border-radius: 24px; outline-offset: 6px; }
+    .about__content { order: -1; max-width: none; padding: var(--about-content-top) 35px 0; }
     .expert-quote__grid { gap: 50px; }
     .video-grid { grid-template-columns: repeat(2, 1fr); }
     .faq__layout { grid-template-columns: 1fr; }
@@ -775,7 +776,6 @@ blockquote footer span { color: #7a817f; font-weight: 500; }
     .treatment-pricing article:last-child { border-bottom: 0; }
     .treatments__note { align-items: flex-start; flex-direction: column; gap: 10px; }
     .condition-list li { grid-template-columns: 45px 1fr; }
-    .about__image { min-height: 440px; }
     .fht-link { grid-template-columns: 76px 1fr auto; gap: 14px; padding: 16px; }
     .fht-link img { width: 76px; }
     .google-reviews__heading { margin-bottom: 42px; }
