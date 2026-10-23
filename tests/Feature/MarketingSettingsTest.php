@@ -11,6 +11,47 @@ class MarketingSettingsTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_settings_open_with_blank_or_invalid_optional_conversion_defaults(): void
+    {
+        config([
+            'google_ads.booking_conversion_value' => '',
+            'google_ads.phone_conversion_value' => '   ',
+            'meta_ads.booking_event_value' => 'not-a-number',
+            'meta_ads.phone_event_value' => null,
+        ]);
+
+        $response = $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.settings.edit'));
+
+        $response->assertOk()->assertSee('Tracking and advertising');
+        $settings = $response->viewData('marketingSettings');
+        $this->assertNull($settings->google_ads_booking_conversion_value);
+        $this->assertNull($settings->google_ads_phone_conversion_value);
+        $this->assertNull($settings->meta_booking_event_value);
+        $this->assertNull($settings->meta_phone_event_value);
+        $this->assertDatabaseEmpty('marketing_settings');
+    }
+
+    public function test_settings_preserve_numeric_conversion_defaults_including_zero(): void
+    {
+        config([
+            'google_ads.booking_conversion_value' => ' 75.50 ',
+            'google_ads.phone_conversion_value' => '0',
+            'meta_ads.booking_event_value' => 25,
+            'meta_ads.phone_event_value' => 1.5,
+        ]);
+
+        $response = $this->actingAs(User::factory()->admin()->create())
+            ->get(route('admin.settings.edit'));
+
+        $response->assertOk();
+        $settings = $response->viewData('marketingSettings');
+        $this->assertSame('75.50', $settings->google_ads_booking_conversion_value);
+        $this->assertSame('0.00', $settings->google_ads_phone_conversion_value);
+        $this->assertSame('25.00', $settings->meta_booking_event_value);
+        $this->assertSame('1.50', $settings->meta_phone_event_value);
+    }
+
     public function test_an_admin_can_manage_marketing_tracking_settings(): void
     {
         $admin = User::factory()->admin()->create();
