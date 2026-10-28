@@ -359,11 +359,33 @@ class BookingCalendarTest extends TestCase
             ->assertSee('07915 910 033');
     }
 
+    public function test_calendar_remains_available_for_a_rolling_year(): void
+    {
+        $this->travelTo(CarbonImmutable::parse('2026-10-14 09:00:00', 'Europe/London'));
+
+        $this->getJson(route('appointments.availability', ['month' => '2026-12']))
+            ->assertOk()
+            ->assertJsonPath('next_month', '2027-01');
+
+        $this->getJson(route('appointments.availability', ['month' => '2027-10']))
+            ->assertOk()
+            ->assertJsonPath('next_month', null);
+
+        $this->assertTrue(Appointment::isBookableStart(CarbonImmutable::parse('2027-10-14 10:00:00', 'Europe/London')));
+        $this->assertFalse(Appointment::isBookableStart(CarbonImmutable::parse('2027-10-15 10:00:00', 'Europe/London')));
+
+        $this->travelTo(CarbonImmutable::parse('2026-11-16 09:00:00', 'Europe/London'));
+
+        $this->getJson(route('appointments.availability', ['month' => '2027-11']))
+            ->assertOk()
+            ->assertJsonPath('next_month', null);
+    }
+
     public function test_availability_rejects_months_outside_the_booking_window(): void
     {
         $this->travelTo(CarbonImmutable::parse('2026-10-14 09:00:00', 'Europe/London'));
 
-        $this->getJson(route('appointments.availability', ['month' => '2027-02']))
+        $this->getJson(route('appointments.availability', ['month' => '2027-11']))
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['month']);
     }

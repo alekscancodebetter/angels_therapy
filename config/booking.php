@@ -19,7 +19,7 @@ return [
     ],
     'interval_minutes' => 60,
     'lead_time_hours' => 12,
-    'booking_window_days' => 62,
+    'booking_window_days' => 365,
     'opening_time' => '08:00',
     'closing_time' => '19:00',
     'admin_interval_minutes' => 30,
