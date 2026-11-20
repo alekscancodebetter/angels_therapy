@@ -81,6 +81,9 @@
                             <div><dt>Date</dt><dd>{{ $confirmation['date'] }}</dd></div>
                             <div><dt>Time</dt><dd>{{ $confirmation['time'] }}</dd></div>
                         </dl>
+                        @if ($confirmation['friend_offer_requested'] ?? false)
+                            <p class="confirmation-card__note">We’ve received your November offer request. Villy will arrange your free 60-minute massage once your friend pays for their first massage.</p>
+                        @endif
                     @endif
 
                     <p class="confirmation-card__note">Please call 07915 910 033 if you need to change your appointment.</p>

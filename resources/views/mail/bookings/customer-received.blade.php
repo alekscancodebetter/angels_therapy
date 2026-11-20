@@ -10,6 +10,10 @@ Thank you for requesting an appointment with Angel Touch Therapy. Your preferred
 **Time:** {{ $appointment->starts_at->timezone(config('app.timezone'))->format('g:i A') }}  
 **Duration:** {{ $appointment->duration_minutes }} minutes
 
+@if ($appointment->friend_offer_requested)
+We’ve noted your November friend offer request. Villy will be in touch to arrange your free 60-minute massage once your friend pays for their first massage.
+@endif
+
 You will receive another email when the appointment is confirmed. If you need to make a change, reply to this email or call 07915 910 033.
 
 <x-mail::button :url="route('home')">

@@ -17,6 +17,10 @@ return [
         'price' => 210,
         'note' => 'Paid in advance',
     ],
+    'friend_offer' => [
+        'starts_on' => '2026-11-01',
+        'ends_on' => '2026-11-30',
+    ],
     'interval_minutes' => 60,
     'lead_time_hours' => 12,
     'booking_window_days' => 62,

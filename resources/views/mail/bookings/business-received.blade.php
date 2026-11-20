@@ -11,6 +11,10 @@
 **Email:** {{ $appointment->customer->email }}  
 **Telephone:** {{ $appointment->customer->phone }}
 
+@if ($appointment->friend_offer_requested)
+**November friend offer requested.** Verify that the friend has paid for their first massage before arranging the free 60-minute massage for the person who made the booking.
+@endif
+
 @if ($appointment->notes)
 **Customer message:**  
 {{ $appointment->notes }}

@@ -54,6 +54,7 @@ class BookingController extends Controller
                         'duration_minutes' => $durationMinutes,
                         'status' => Appointment::STATUS_PENDING_CONFIRMATION,
                         'notes' => $validated['message'] ?? null,
+                        'friend_offer_requested' => isset($validated['friend_offer_requested']),
                     ]);
                 });
             });
@@ -76,6 +77,7 @@ class BookingController extends Controller
             'duration' => $durationMinutes,
             'date' => $startsAt->format('l, j F'),
             'time' => $startsAt->format('g:i A'),
+            'friend_offer_requested' => $appointment->friend_offer_requested,
         ]);
     }
 

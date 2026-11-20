@@ -3,6 +3,7 @@
 <head>
     @php
         $canonicalUrl = rtrim((string) config('app.canonical_url'), '/').route('home', [], false);
+        $friendOfferAvailable = \App\Models\Appointment::isFriendOfferAvailable();
     @endphp
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -106,6 +107,19 @@
                 <span>NuDerma Clinic</span><span>137 Wetherby Road</span><span>Harrogate · HG2 7AA</span>
             </div>
         </section>
+
+        @if ($friendOfferAvailable)
+            <section class="friend-offer" aria-labelledby="friend-offer-title">
+                <div class="container friend-offer__content">
+                    <div>
+                        <p class="eyebrow">November offer · Book by <time datetime="{{ config('booking.friend_offer.ends_on') }}">{{ \Carbon\CarbonImmutable::parse(config('booking.friend_offer.ends_on'))->format('j F Y') }}</time></p>
+                        <h2 id="friend-offer-title">Book for a friend. Earn a free massage.</h2>
+                        <p>Once your friend pays for their first massage, Villy will arrange one free 60-minute massage for you.</p>
+                    </div>
+                    <a class="button button--gold" href="#booking">Book for a friend</a>
+                </div>
+            </section>
+        @endif
 
         <section class="intro section section--ivory" aria-labelledby="intro-title">
             <div class="container intro__grid reveal">
@@ -329,6 +343,9 @@
                 @if ($errors->any())
                     <div class="form-errors booking-status" id="booking-errors" role="alert" tabindex="-1" data-booking-errors>
                         <p><strong>We could not complete your booking.</strong> Please check the highlighted details below.</p>
+                        @unless ($friendOfferAvailable)
+                            @error('friend_offer_requested')<p>{{ $message }}</p>@enderror
+                        @endunless
                     </div>
                 @endif
 
@@ -393,6 +410,16 @@
                                 </fieldset>
                             </div>
                             <p class="booking-package-note"><strong>Prepaid package:</strong> {{ config('booking.package.label') }} for £{{ config('booking.package.price') }}. Mention the package in your message or contact Villy to arrange it.</p>
+                            @if ($friendOfferAvailable)
+                                <div class="booking-friend-offer">
+                                    <label for="friend_offer_requested">
+                                        <input id="friend_offer_requested" name="friend_offer_requested" type="checkbox" value="1" @checked(old('friend_offer_requested')) aria-describedby="friend_offer_help @error('friend_offer_requested') friend_offer_error @enderror" @error('friend_offer_requested') aria-invalid="true" @enderror>
+                                        <span>I’m booking for a friend and would like to request the November offer.</span>
+                                    </label>
+                                    <p id="friend_offer_help">Use your own contact details. You qualify for one free 60-minute massage after your friend pays for their first massage.</p>
+                                    @error('friend_offer_requested')<small id="friend_offer_error">{{ $message }}</small>@enderror
+                                </div>
+                            @endif
                             <div class="booking-form__row booking-form__row--contact">
                                 <label for="name"><span>Name</span><input id="name" name="name" type="text" value="{{ old('name') }}" autocomplete="name" required @error('name') aria-invalid="true" aria-describedby="name_error" @enderror>@error('name')<small id="name_error">{{ $message }}</small>@enderror</label>
                                 <x-phone-input />

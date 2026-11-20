@@ -30,6 +30,11 @@ class StoreBookingRequest extends FormRequest
             'phone_country' => ['required', 'string', Rule::in(array_keys(PhoneNumber::countries()))],
             'phone' => ['required', 'string', 'max:40', PhoneNumber::validationRule($this->string('phone_country')->toString())],
             'message' => ['nullable', 'string', 'max:2000'],
+            'friend_offer_requested' => [
+                'sometimes',
+                'accepted',
+                Rule::prohibitedIf(! Appointment::isFriendOfferAvailable()),
+            ],
             'terms_accepted' => ['accepted'],
         ];
     }
@@ -47,6 +52,8 @@ class StoreBookingRequest extends FormRequest
             'phone_country.required' => 'Please choose a country calling code.',
             'phone_country.in' => 'Please choose a valid country calling code.',
             'phone.required' => 'Please enter your telephone number.',
+            'friend_offer_requested.accepted' => 'Please tick the offer box if you are booking for a friend.',
+            'friend_offer_requested.prohibited' => 'The November friend offer is unavailable. You can still submit a regular booking.',
             'terms_accepted.accepted' => 'Please accept the terms and conditions before booking.',
         ];
     }

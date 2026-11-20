@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 
-#[Fillable(['customer_id', 'treatment_slug', 'starts_at', 'duration_minutes', 'status', 'notes'])]
+#[Fillable(['customer_id', 'treatment_slug', 'starts_at', 'duration_minutes', 'status', 'notes', 'friend_offer_requested'])]
 class Appointment extends Model
 {
     /** @use HasFactory<AppointmentFactory> */
@@ -85,6 +85,13 @@ class Appointment extends Model
         }
 
         return $openingTime->diffInMinutes($slotStartsAt) % $intervalMinutes === 0;
+    }
+
+    public static function isFriendOfferAvailable(): bool
+    {
+        $today = CarbonImmutable::now('Europe/London')->toDateString();
+
+        return $today >= config('booking.friend_offer.starts_on') && $today <= config('booking.friend_offer.ends_on');
     }
 
     /**
@@ -219,6 +226,7 @@ class Appointment extends Model
         return [
             'starts_at' => 'datetime',
             'notes' => 'encrypted',
+            'friend_offer_requested' => 'boolean',
         ];
     }
 }

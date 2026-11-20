@@ -40,6 +40,13 @@ h2 { font-size: clamp(2.65rem, 5.2vw, 5.3rem); }
 .eyebrow--gold { color: #a87518; }
 .section-index { font-size: .7rem; letter-spacing: .17em; text-transform: uppercase; }
 
+.friend-offer { padding-block: clamp(30px, 5vw, 58px); color: #fff; background: var(--ink); border-bottom: 3px solid var(--gold); }
+.friend-offer__content { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 22px 40px; }
+.friend-offer__content > div { flex: 1 1 36rem; }
+.friend-offer .eyebrow { margin-bottom: 12px; }
+.friend-offer h2 { max-width: 22ch; margin-bottom: 12px; font-size: clamp(1.9rem, 4vw, 3.3rem); line-height: 1.08; }
+.friend-offer p:last-child { max-width: 64ch; margin-bottom: 0; color: var(--sky-light); }
+
 .skip-link { position: fixed; z-index: 999; left: 16px; top: -100px; padding: 12px 18px; color: #fff; background: var(--forest); }
 .skip-link:focus { top: 16px; }
 
@@ -427,6 +434,12 @@ blockquote footer span { color: #7a817f; font-weight: 500; }
 .booking-dropdown[aria-invalid="true"] summary { border-color: #a9433b; }
 .booking-package-note { margin: -7px 0 2px; padding: 13px 15px; color: #5d6879; background: rgba(236,207,130,.18); border-left: 3px solid var(--gold); font-size: .75rem; line-height: 1.55; }
 .booking-package-note strong { color: var(--ink); }
+.booking-friend-offer { padding: 14px 15px; color: var(--ink); background: var(--gold-light); border-left: 3px solid var(--gold); }
+.contact-form .booking-friend-offer label { grid-template-columns: 20px minmax(0, 1fr); align-items: start; cursor: pointer; }
+.contact-form .booking-friend-offer input { width: 18px; height: 18px; margin: 2px 0 0; padding: 0; accent-color: var(--forest-deep); }
+.contact-form .booking-friend-offer input:focus-visible { outline: 2px solid var(--forest-deep); outline-offset: 2px; }
+.contact-form .booking-friend-offer label > span { font-size: .85rem; letter-spacing: normal; text-transform: none; }
+.booking-friend-offer p { margin: 4px 0 0 29px; font-size: .75rem; line-height: 1.55; }
 .booking-form label em { margin-left: 4px; color: #7b8797; font-size: .57rem; font-style: normal; letter-spacing: .08em; }
 .booking-form .booking-field-help { color: #59677b; }
 .booking-phone-field { min-width: 0; margin: 0; padding: 0; border: 0; }

@@ -16,6 +16,9 @@
         </div>
         <a class="admin-back-link" href="{{ route('admin.calendar', ['month' => $appointment->starts_at->format('Y-m')]) }}">← Back to calendar</a>
     </div>
+    @if ($appointment->friend_offer_requested)
+        <p class="admin-notice"><strong>November friend offer requested.</strong> Verify that the friend has paid for their first massage before arranging the free 60-minute massage for the person who made the booking.</p>
+    @endif
     <section class="admin-panel admin-form-panel">
         @include('admin.partials.errors')
         <form class="admin-form" method="POST" action="{{ route('admin.appointments.update', $appointment) }}">
