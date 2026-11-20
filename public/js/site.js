@@ -59,6 +59,7 @@
     });
 
     nav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => closeMenu()));
+    header?.querySelector('[data-promotion-booking]')?.addEventListener('click', () => closeMenu());
 
     nav?.querySelectorAll('.nav-dropdown').forEach((dropdown) => {
         let closeTimer;

@@ -40,13 +40,6 @@ h2 { font-size: clamp(2.65rem, 5.2vw, 5.3rem); }
 .eyebrow--gold { color: #a87518; }
 .section-index { font-size: .7rem; letter-spacing: .17em; text-transform: uppercase; }
 
-.friend-offer { padding-block: clamp(30px, 5vw, 58px); color: #fff; background: var(--ink); border-bottom: 3px solid var(--gold); }
-.friend-offer__content { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 22px 40px; }
-.friend-offer__content > div { flex: 1 1 36rem; }
-.friend-offer .eyebrow { margin-bottom: 12px; }
-.friend-offer h2 { max-width: 22ch; margin-bottom: 12px; font-size: clamp(1.9rem, 4vw, 3.3rem); line-height: 1.08; }
-.friend-offer p:last-child { max-width: 64ch; margin-bottom: 0; color: var(--sky-light); }
-
 .skip-link { position: fixed; z-index: 999; left: 16px; top: -100px; padding: 12px 18px; color: #fff; background: var(--forest); }
 .skip-link:focus { top: 16px; }
 
@@ -55,6 +48,14 @@ h2 { font-size: clamp(2.65rem, 5.2vw, 5.3rem); }
 .site-header > * { pointer-events: auto; }
 .site-header.is-scrolled { top: var(--header-scrolled-top); min-height: 0; background: transparent; box-shadow: none; }
 .site-header--solid { background: transparent; }
+html:has(.header-friend-offer) { --anchor-offset: 11rem; }
+.site-header:has(.header-friend-offer) { row-gap: min(10px, 2vw); }
+.header-friend-offer { grid-column: 1 / -1; justify-self: center; width: min(100%, 850px); min-height: 54px; padding: 8px clamp(12px, 2vw, 20px); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; color: #fff; background: var(--ink); border: 1px solid var(--gold); border-radius: 16px; box-shadow: 0 8px 24px rgba(19,40,74,.24); }
+.header-friend-offer__details { display: grid; gap: 2px; color: var(--sky-light); font-size: .78rem; line-height: 1.3; }
+.header-friend-offer__details strong { color: var(--gold-light); font-size: .95rem; }
+.header-friend-offer__details time { white-space: nowrap; }
+.header-friend-offer__action { padding: 6px 10px; color: var(--ink); background: var(--gold-light); border-radius: 999px; font-size: .75rem; font-weight: 750; white-space: nowrap; }
+.header-friend-offer:hover .header-friend-offer__action, .header-friend-offer:focus-visible .header-friend-offer__action { background: #fff; }
 .brand { min-height: 68px; padding: 7px 18px 7px 10px; display: inline-flex; align-items: center; gap: 12px; flex: none; border: 1px solid rgba(255,255,255,.56); border-radius: 999px; background: linear-gradient(135deg, rgba(255,255,255,.64), rgba(220,239,255,.24)); box-shadow: 0 15px 42px rgba(19,40,74,.14), inset 0 1px 0 rgba(255,255,255,.78); backdrop-filter: blur(18px) saturate(135%); -webkit-backdrop-filter: blur(18px) saturate(135%); transition: background .3s ease, box-shadow .3s ease, transform .3s ease; }
 .brand:hover, .brand:focus-visible { background: rgba(255,255,255,.94); box-shadow: 0 18px 48px rgba(19,40,74,.19), inset 0 1px 0 #fff; transform: translateY(-2px); }
 .brand__mark { width: 78px; height: 48px; flex: none; padding: 4px 6px; object-fit: contain; border: 1px solid rgba(236,207,130,.58); background: rgba(255,255,255,.97); box-shadow: 0 5px 18px rgba(29,84,120,.14); }
@@ -109,11 +110,13 @@ h2 { font-size: clamp(2.65rem, 5.2vw, 5.3rem); }
 .button--dark { color: #fff; background: var(--forest); }
 .button--dark:hover, .button--dark:focus-visible { background: var(--forest-deep); }
 
-.hero { position: relative; min-height: 900px; height: 100svh; overflow: hidden; color: #fff; background: var(--forest-deep); }
+.hero { --hero-min-height: 900px; position: relative; min-height: var(--hero-min-height); height: 100svh; overflow: hidden; color: #fff; background: var(--forest-deep); }
 .hero__image, .hero__veil { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hero__image { object-fit: cover; object-position: center; animation: hero-in 1.4s cubic-bezier(.2,.8,.2,1) both; }
 .hero__veil { background: linear-gradient(90deg, rgba(29,84,120,.82) 0%, rgba(47,126,169,.58) 38%, rgba(117,196,236,.18) 70%, rgba(117,196,236,.05) 100%), linear-gradient(0deg, rgba(29,84,120,.25), transparent 45%); }
-.hero__content { position: relative; z-index: 2; height: 100%; padding-top: 164px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+.hero__content { --hero-top-padding: 164px; position: relative; z-index: 2; height: 100%; padding-top: var(--hero-top-padding); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; }
+.site-header:has(.header-friend-offer) + main .hero { display: flex; flex-direction: column; min-height: max(var(--hero-min-height), 100svh); height: auto; }
+.site-header:has(.header-friend-offer) + main .hero__content { flex: 1; height: auto; padding-top: max(var(--hero-top-padding), calc(var(--anchor-offset) + 16px)); }
 .site-header .brand__copy { display: grid; gap: 8px; }
 .site-header .brand__copy strong { color: #fff; font-family: var(--serif); font-size: 1.6rem; font-weight: 400; letter-spacing: .07em; line-height: 1; white-space: nowrap; text-transform: uppercase; }
 .site-header .brand__copy strong b { color: var(--gold-light); font-weight: 500; }
@@ -696,10 +699,10 @@ blockquote footer span { color: #7a817f; font-weight: 500; }
     .nav-dropdown__menu::before { display: none; }
     .nav-dropdown[open] .nav-dropdown__menu { display: grid; transform: none; }
     .nav-dropdown__menu a { padding: 11px 12px; font-size: 1rem; }
-    .hero { min-height: 760px; }
+    .hero { --hero-min-height: 760px; }
     .hero__image { object-position: 62% center; }
     .hero__veil { background: linear-gradient(90deg, rgba(29,84,120,.8), rgba(75,153,194,.25)), linear-gradient(0deg, rgba(29,84,120,.38), transparent); }
-    .hero__content { padding-top: 110px; padding-bottom: 110px; }
+    .hero__content { --hero-top-padding: 110px; padding-bottom: 110px; }
     .hero h1 { font-size: clamp(3.5rem, 13.5vw, 6rem); }
     .hero__aside { min-width: 0; width: 100%; padding: 13px 18px; flex-direction: row; flex-wrap: wrap; gap: 5px 15px; }
     .booking-heading, .booking-layout, .practice-info { grid-template-columns: 1fr; }
@@ -758,6 +761,7 @@ blockquote footer span { color: #7a817f; font-weight: 500; }
 }
 
 @media (max-width: 560px) {
+    .header-friend-offer__action > span { display: none; }
     .site-header { padding-inline: 8px; gap: 6px; }
     .brand strong { font-size: .91rem; }
     .brand small { font-size: .48rem; }

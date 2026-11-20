@@ -22,8 +22,13 @@ class NovemberFriendOfferTest extends TestCase
 
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('Book for a friend. Earn a free massage.')
-            ->assertSee('Once your friend pays for their first massage')
+            ->assertSeeInOrder([
+                '<header class="site-header" data-header>',
+                '<a class="header-friend-offer" href="#booking" data-promotion-booking>',
+                'Book for a friend. Get a free 60-minute massage.',
+                'After your friend pays for their first massage.',
+                '</header>',
+            ], false)
             ->assertSee('30 November 2026')
             ->assertSee('name="friend_offer_requested"', false)
             ->assertSee('You qualify for one free 60-minute massage after your friend pays for their first massage.');
@@ -37,7 +42,7 @@ class NovemberFriendOfferTest extends TestCase
 
         $this->get(route('home'))
             ->assertOk()
-            ->assertDontSee('Book for a friend. Earn a free massage.')
+            ->assertDontSee('data-promotion-booking', false)
             ->assertDontSee('name="friend_offer_requested"', false);
     }
 

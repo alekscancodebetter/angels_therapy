@@ -48,6 +48,16 @@
     <a class="skip-link" href="#main">Skip to content</a>
 
     <header class="site-header" data-header>
+        @if ($friendOfferAvailable)
+            <a class="header-friend-offer" href="#booking" data-promotion-booking>
+                <span class="header-friend-offer__details">
+                    <strong>Book for a friend. Get a free 60-minute massage.</strong>
+                    <span>After your friend pays for their first massage. Book by <time datetime="{{ config('booking.friend_offer.ends_on') }}">{{ \Carbon\CarbonImmutable::parse(config('booking.friend_offer.ends_on'))->format('j F Y') }}</time>.</span>
+                </span>
+                <span class="header-friend-offer__action" aria-hidden="true"><span>Book for a friend</span> →</span>
+            </a>
+        @endif
+
         <a class="brand" href="#top" aria-label="Angel Touch Therapy home">
             <img class="brand__mark" src="{{ asset('images/angel-touch-customer-mark.webp') }}" alt="Angel Touch Therapy wing and golden hand logo" width="720" height="720" fetchpriority="high">
             <span class="brand__copy" aria-label="Angel Touch Therapy Harrogate">
@@ -107,19 +117,6 @@
                 <span>NuDerma Clinic</span><span>137 Wetherby Road</span><span>Harrogate · HG2 7AA</span>
             </div>
         </section>
-
-        @if ($friendOfferAvailable)
-            <section class="friend-offer" aria-labelledby="friend-offer-title">
-                <div class="container friend-offer__content">
-                    <div>
-                        <p class="eyebrow">November offer · Book by <time datetime="{{ config('booking.friend_offer.ends_on') }}">{{ \Carbon\CarbonImmutable::parse(config('booking.friend_offer.ends_on'))->format('j F Y') }}</time></p>
-                        <h2 id="friend-offer-title">Book for a friend. Earn a free massage.</h2>
-                        <p>Once your friend pays for their first massage, Villy will arrange one free 60-minute massage for you.</p>
-                    </div>
-                    <a class="button button--gold" href="#booking">Book for a friend</a>
-                </div>
-            </section>
-        @endif
 
         <section class="intro section section--ivory" aria-labelledby="intro-title">
             <div class="container intro__grid reveal">
